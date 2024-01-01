@@ -15,6 +15,15 @@ mimiuchi is a free, customizable, OSC capable, speech-to-text application for di
 - (WIP) Custom OSC param execution via language triggers ("turn my marker on" -> `/avatar/parameter/Marker True`)
 - ...and many settings to customize the experience!
 
+## Fork features
+- Hotkeys
+- Auto Start
+
+TODO
+- Hide Footer
+- Formatting
+- Automatic Translation
+
 ## How to use
 
 ### Speech-to-Text
