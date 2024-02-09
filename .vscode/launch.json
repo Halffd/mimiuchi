@@ -21,6 +21,14 @@
   ],
   "configurations": [
     {
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "request": "attach",
+      "url": "http://localhost:5173/",
+      "type": "chrome",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
       "name": "Debug Main Process",
       "type": "pwa-node",
       "request": "launch",

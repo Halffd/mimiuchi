@@ -3,7 +3,7 @@
     <SystemBar v-if="is_electron()"></SystemBar>
     <router-view name="Header"></router-view>    
     <v-main style="--v-layout-left: 0px; --v-layout-right: 0px; --v-layout-top: 0px; --v-layout-bottom: 60px; margin-bottom: -60px;">
-      <router-view class="fullscreen-router-view"></router-view>
+      <router-view :footer="footer" class="fullscreen-router-view"></router-view>
     </v-main>
     <!-- Hide Footer Button -->
     <v-btn v-if="!footer" class="corner-button" color="primary" icon @click="toggleFooter">
@@ -42,25 +42,25 @@ export default {
   methods: {
     toggleFooter() {
       this.footer = !this.footer;
-      let el: HTMLElement | null = document.querySelector("#log-list")
+      let el:  HTMLElement | null = document.querySelector("#log-list")
       let em: HTMLElement | null = document.querySelector(".v-main")
       let ef: HTMLElement | null = document.querySelector("#app > div > div > footer")
       if(el && em && ef){
           var rs = getComputedStyle(el);
           console.log(el,em,ef,this.ft);
-          if(rs.getPropertyValue("--933e9cdf-outer_size") != '0'){
+          if(ef.style.height  != '0px'){
               ef.style.height = '0'
               ef.style.padding = '0'
               em.style.setProperty('margin-bottom', '0');
               em.style.setProperty('--v-layout-bottom', '0');
-              el.style.setProperty('--933e9cdf-outer_size', '0');
+             // el.style.setProperty('--933e9cdf-outer_size', '0');
           } else {
-              this.ft = true
               em.style.setProperty('--v-layout-bottom', '60px');
-              el.style.setProperty('--933e9cdf-outer_size', '55px');
+              //el.style.setProperty('--933e9cdf-outer_size', '55px');
               ef.style.height = '60px'
               ef.style.padding = '8px'
-          }
+            }
+            //el.scrollTop = el.scrollHeight
       }
     },
   },
