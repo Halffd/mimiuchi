@@ -327,6 +327,10 @@ export default {
 
         copyToClipboard() {
             // Copy the input_text to the clipboard
+            let el: HTMLElement | null = document.querySelector("#log-list")
+            if(el){
+                this.input_text = el.innerText
+            }
             navigator.clipboard.writeText(String(this.input_text))
                 .then(() => {
                     this.showToast('Text copied to clipboard.', 'success');
@@ -491,7 +495,9 @@ for (let c of links) {
                 this.changeAutoStartSpeech();
             } else if (event.key === 'w') {
                 // Ctrl + W: Toggle requests
-                this.toggleRequests();
+      let el: HTMLElement | null = document.querySelector("#log-list")
+      el.scrollTop = el.scrollHeight
+                //this.toggleRequests();
             } else if (event.key === 'e') {
                 // Ctrl + E: Search
                 this.search();
