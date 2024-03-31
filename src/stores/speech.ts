@@ -11,10 +11,13 @@ import is_electron from '@/helpers/is_electron'
 import { i18n } from '@/plugins/i18n'
 import { WebSpeech } from '@/modules/speech'
 
+<<<<<<< HEAD
 interface pinned_languages {
   [key: string]: list_item
 }
 
+=======
+>>>>>>> d4cb924 (autostart)
 declare const window: any
 
 export const useSpeechStore = defineStore('speech', {
@@ -38,7 +41,10 @@ export const useSpeechStore = defineStore('speech', {
       rate: 1,
       pitch: 1,
     },
+<<<<<<< HEAD
     pinned_languages: {} as pinned_languages,
+=======
+>>>>>>> d4cb924 (autostart)
   }),
   getters: {
 
@@ -109,7 +115,11 @@ export const useSpeechStore = defineStore('speech', {
       speech.speak(input)
     },
     async on_submit(log: any, index: number) {
+<<<<<<< HEAD
       if (!log.transcript.trim()) // If the submitted input is only whitespace, do nothing. This may occur if the user only submitted whitespace.
+=======
+      if (!log.transcript.replace(/\s/g, '').length)
+>>>>>>> d4cb924 (autostart)
         return
 
       const logStore = useLogStore()
@@ -124,11 +134,14 @@ export const useSpeechStore = defineStore('speech', {
 
       // word replace
       log.transcript = replace_words(log.transcript)
+<<<<<<< HEAD
       if (!log.transcript.trim()) { // If the processed input is only whitespace, do nothing. This may occur if the entire log transcript was replaced with whitespace.
         logStore.loading_result = false
 
         return
       }
+=======
+>>>>>>> d4cb924 (autostart)
 
       // scroll to bottom
       const loglist = document.getElementById('loglist')
@@ -162,7 +175,11 @@ export const useSpeechStore = defineStore('speech', {
         logStore.loading_result = false
 
         // translate if not translating and enabled
+<<<<<<< HEAD
         if (is_electron() && translationStore.enabled && !log.translate && !log.translation) {
+=======
+        if (translationStore.enabled && !log.translate && !log.translation) {
+>>>>>>> d4cb924 (autostart)
           logStore.logs[i].translate = true
           defaultStore.worker.postMessage({
             text: log.transcript,
@@ -205,6 +222,7 @@ export const useSpeechStore = defineStore('speech', {
       if (is_electron() && (oscStore.osc_text) && defaultStore.broadcasting) {
         if (log.isTranslationFinal && log.translation) {
           const transcript = (translationStore.show_original) ? `${log.transcript} (${log.translation})` : log.translation
+<<<<<<< HEAD
           const data = {
             transcript,
             hide_ui: !oscStore.show_keyboard,
@@ -219,12 +237,19 @@ export const useSpeechStore = defineStore('speech', {
             sfx: oscStore.sfx,
           }
           window.ipcRenderer.send('send-text-event', JSON.stringify(data))
+=======
+          window.ipcRenderer.send('send-text-event', `{ "transcript": "${transcript}", "hide_ui": ${!oscStore.show_keyboard}, "sfx": ${oscStore.sfx} }`)
+        }
+        else if (log.isFinal && !log.translate) {
+          window.ipcRenderer.send('send-text-event', `{ "transcript": "${log.transcript}", "hide_ui": ${!oscStore.show_keyboard}, "sfx": ${oscStore.sfx} }`)
+>>>>>>> d4cb924 (autostart)
         }
       }
       else if (defaultStore.ws) {
         defaultStore.ws.send(`{"type": "text", "data": ${JSON.stringify(log)}}`)
       }
     },
+<<<<<<< HEAD
     pin_language(selected_language: list_item) {
       const pins = this.pinned_languages
 
@@ -252,5 +277,7 @@ export const useSpeechStore = defineStore('speech', {
 
       return pins.hasOwnProperty(selected_language.title)
     },
+=======
+>>>>>>> d4cb924 (autostart)
   },
 })

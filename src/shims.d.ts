@@ -9,10 +9,13 @@ declare module '*.vue' {
   export default component
 }
 
+<<<<<<< HEAD
 interface list_item {
   title: string
   value: string
 }
 
+=======
+>>>>>>> d4cb924 (autostart)
 declare const __APP_NAME__: string
 declare const __APP_VERSION__: string

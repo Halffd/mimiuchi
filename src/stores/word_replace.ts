@@ -7,15 +7,20 @@ interface word_replacements {
 export const useWordReplaceStore = defineStore('wordreplace', {
   state: () => ({
     enabled: true,
+<<<<<<< HEAD
     match_whole_word: false,
     match_case: false,
     word_replacements: {} as word_replacements,
     word_replacements_lowercase: {} as word_replacements,
+=======
+    word_replacements: {} as word_replacements,
+>>>>>>> d4cb924 (autostart)
   }),
   getters: {
 
   },
   actions: {
+<<<<<<< HEAD
     // Escape regex metacharacters
     escapeRegExp(input: string) {
       return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -63,6 +68,14 @@ export const useWordReplaceStore = defineStore('wordreplace', {
           return this.word_replacements_lowercase[matched.toLowerCase()]
         else
           return this.word_replacements[matched]
+=======
+    replace_words(input: string): string {
+      if (!this.enabled || !Object.keys(this.word_replacements).length)
+        return input
+      const replace_re = new RegExp(Object.keys(this.word_replacements).join('|'), 'gi')
+      return input.replace(replace_re, (matched) => {
+        return this.word_replacements[matched.toLowerCase()]
+>>>>>>> d4cb924 (autostart)
       })
     },
   },

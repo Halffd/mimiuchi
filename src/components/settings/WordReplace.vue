@@ -3,6 +3,7 @@
     <v-divider />
     <v-card-text>
       <v-card flat>
+<<<<<<< HEAD
         <v-list-item :title="$t('settings.word_replace.enabled')">
           <template #append>
             <v-switch
@@ -50,6 +51,23 @@
             <v-text-field v-model="replacement.replacing" :label="$t('settings.word_replace.replacing')" :rules="[exists]" append-icon="mdi-arrow-right-bold" />
           </v-col>
           <v-col :cols="10" :sm="6" class="pt-1 pb-0">
+=======
+        <v-switch
+          v-model="wordReplaceStore.enabled"
+          :label="$t('settings.word_replace.enabled')"
+          color="primary"
+          hide-details
+          inset
+          class="mx-3"
+        />
+      </v-card>
+      <div v-if="replacements.length" class="mt-6">
+        <v-row v-for="(replacement, i) in replacements">
+          <v-col :cols="12" :sm="6">
+            <v-text-field v-model="replacement.replacing" :label="$t('settings.word_replace.replacing')" append-icon="mdi-arrow-right-bold" hide-details />
+          </v-col>
+          <v-col :cols="10" :sm="6">
+>>>>>>> d4cb924 (autostart)
             <v-text-field v-model="replacement.replacement" :label="$t('settings.word_replace.replacement')" hide-details>
               <template #append>
                 <v-btn size="x-small" color="red" icon="mdi-minus" @click="remove_entry(i)" />
@@ -87,6 +105,7 @@ export default {
   }),
   unmounted() {
     this.wordReplaceStore.word_replacements = {}
+<<<<<<< HEAD
 
     this.replacements
       .sort((a, b) => a.replacing.localeCompare(b.replacing)) // Sort keys by locale (e.g., alphabetical sort). This is cosmetic.
@@ -105,6 +124,10 @@ export default {
       // When ordered by locale, their order is ["hello", "Hello"]. The replacement entry for "hello" will be used in case-insensitive replacements.
       if (!this.wordReplaceStore.word_replacements_lowercase[keyLowerCase])
         this.wordReplaceStore.word_replacements_lowercase[keyLowerCase] = this.wordReplaceStore.word_replacements[key]
+=======
+    this.replacements.forEach((entry) => {
+      this.wordReplaceStore.word_replacements[entry.replacing.toLowerCase()] = entry.replacement
+>>>>>>> d4cb924 (autostart)
     })
   },
   mounted() {
@@ -112,9 +135,17 @@ export default {
       replacing,
       replacement,
     }))
+<<<<<<< HEAD
   },
   methods: {
     add_entry() {
+=======
+    // console.log(this.replacements)
+  },
+  methods: {
+    add_entry() {
+      // this.wordReplaceStore.word_replacements[""] = ""
+>>>>>>> d4cb924 (autostart)
       this.replacements.push({
         replacing: '',
         replacement: '',
@@ -122,9 +153,13 @@ export default {
     },
     remove_entry(i: number) {
       this.replacements.splice(i, 1)
+<<<<<<< HEAD
     },
     exists(value: string) {
       return !value || this.replacements.filter((e: any) => value === e.replacing).length < 2 || `${value} already exists`
+=======
+      // delete this.wordReplaceStore.word_replacements[this.replacement_list[i].replacing]
+>>>>>>> d4cb924 (autostart)
     },
   },
 }

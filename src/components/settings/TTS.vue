@@ -4,6 +4,7 @@
     <v-card-text>
       <v-row>
         <v-col :cols="12">
+<<<<<<< HEAD
           <v-card>
             <v-list-item :title="$t('settings.tts.enabled') ">
               <template #append>
@@ -15,6 +16,17 @@
                 />
               </template>
             </v-list-item>
+=======
+          <v-card flat>
+            <v-switch
+              v-model="speechStore.tts.enabled"
+              :label="$t('settings.tts.enabled')"
+              color="primary"
+              hide-details
+              inset
+              class="mx-3"
+            />
+>>>>>>> d4cb924 (autostart)
           </v-card>
         </v-col>
         <v-col :cols="12">

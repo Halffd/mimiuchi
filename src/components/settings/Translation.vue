@@ -2,7 +2,11 @@
   <v-card :title="$t('settings.translation.title')" :subtitle="$t('settings.translation.description')" color="transparent" flat>
     <v-divider />
     <v-card-text>
+<<<<<<< HEAD
       <v-row v-if="is_electron()">
+=======
+      <v-row>
+>>>>>>> d4cb924 (autostart)
         <v-col>
           <v-chip variant="outlined" label color="error" size="large">
             <v-icon start icon="mdi-alert" />
@@ -11,6 +15,7 @@
         </v-col>
         <v-col :cols="12">
           <v-card flat>
+<<<<<<< HEAD
             <v-list-item :title="$t('settings.translation.enabled')">
               <template #append>
                 <v-switch
@@ -21,6 +26,16 @@
                 />
               </template>
             </v-list-item>
+=======
+            <v-switch
+              v-model="translationStore.enabled"
+              :label="$t('settings.translation.enabled')"
+              color="primary"
+              hide-details
+              inset
+              class="mx-3"
+            />
+>>>>>>> d4cb924 (autostart)
           </v-card>
         </v-col>
         <v-col :cols="12">
@@ -76,6 +91,7 @@
         </v-col>
         <v-col :cols="12">
           <v-card flat>
+<<<<<<< HEAD
             <v-list-item :title="$t('settings.translation.show_original')">
               <template #append>
                 <v-switch
@@ -98,6 +114,19 @@
           </v-alert-title>
         </v-alert>
       </v-card-text>
+=======
+            <v-switch
+              v-model="translationStore.show_original"
+              :label="$t('settings.translation.show_original')"
+              color="primary"
+              hide-details
+              inset
+              class="mx-3"
+            />
+          </v-card>
+        </v-col>
+      </v-row>
+>>>>>>> d4cb924 (autostart)
     </v-card-text>
   </v-card>
 </template>
@@ -107,8 +136,11 @@ import { useTranslationStore } from '@/stores/translation'
 import { useSpeechStore } from '@/stores/speech'
 import translation_options from '@/constants/translation_options'
 
+<<<<<<< HEAD
 import is_electron from '@/helpers/is_electron'
 
+=======
+>>>>>>> d4cb924 (autostart)
 export default {
   name: 'SettingsTranslation',
   setup() {
@@ -118,7 +150,10 @@ export default {
     return {
       translationStore,
       stt_language: speechStore.stt.language,
+<<<<<<< HEAD
       is_electron,
+=======
+>>>>>>> d4cb924 (autostart)
     }
   },
   data() {
@@ -137,8 +172,14 @@ export default {
 
   },
   methods: {
+<<<<<<< HEAD
     openURL(url: string) {
       window.open(url, '_blank')
+=======
+    open_external(link: string | null) {
+      if (link)
+        window.open(link, '_blank')
+>>>>>>> d4cb924 (autostart)
     },
   },
 }

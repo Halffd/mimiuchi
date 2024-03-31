@@ -71,6 +71,7 @@
         </v-col>
         <v-divider />
         <v-col :cols="12" :md="12" class="pb-0">
+<<<<<<< HEAD
           <v-card>
             <v-list-item :title="$t('settings.appearance.text.fade')">
               <template #append>
@@ -83,6 +84,17 @@
               </template>
             </v-list-item>
           </v-card>
+=======
+          <v-list-item :title="$t('settings.appearance.text.fade')">
+            <template #append>
+              <v-switch
+                v-model="appearanceStore.text.enable_fade"
+                color="primary"
+                inset hide-details
+              />
+            </template>
+          </v-list-item>
+>>>>>>> d4cb924 (autostart)
         </v-col>
         <v-col :cols="12" :sm="6">
           <v-text-field
