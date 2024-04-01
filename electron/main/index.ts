@@ -49,7 +49,7 @@ let wss: any
 const window_config: any = {
   title: 'Main window',
   width: 800,
-  height: 250,
+  height: 600,
   icon: join(process.env.PUBLIC, 'favicon.ico'),
   frame: false,
   titleBarStyle: 'hidden',
