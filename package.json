@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "@rushstack/eslint-patch": "^1.6.1",
     "@rushstack/eslint-patch": "^1.10.1",
     "@types/node-osc": "^6.0.3",
     "@vue/eslint-config-prettier": "^8.0.0",

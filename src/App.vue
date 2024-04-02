@@ -34,36 +34,6 @@ export default {
   components: {
     SystemBar
   },
-  data() {
-    return {
-      footer: true
-    };
-  },
-  methods: {
-    toggleFooter() {
-      this.footer = !this.footer;
-      let el:  HTMLElement | null = document.querySelector("#log-list")
-      let em: HTMLElement | null = document.querySelector(".v-main")
-      let ef: HTMLElement | null = document.querySelector("#app > div > div > footer")
-      if(el && em && ef){
-          var rs = getComputedStyle(el);
-          console.log(el,em,ef,this.ft);
-          if(ef.style.height  != '0px'){
-              ef.style.height = '0'
-              ef.style.padding = '0'
-              em.style.setProperty('margin-bottom', '0');
-              em.style.setProperty('--v-layout-bottom', '0');
-             // el.style.setProperty('--933e9cdf-outer_size', '0');
-          } else {
-              em.style.setProperty('--v-layout-bottom', '60px');
-              //el.style.setProperty('--933e9cdf-outer_size', '55px');
-              ef.style.height = '60px'
-              ef.style.padding = '8px'
-            }
-            //el.scrollTop = el.scrollHeight
-      }
-    },
-  },
   setup() {
     const appearanceStore = useAppearanceStore()
     const speechStore = useSpeechStore()
@@ -111,23 +81,50 @@ export default {
       wordReplaceStore,
     }
   },
+  data() {
+    return {
+      footer: true
+    };
+  },
   unmounted() {
-    if (this.is_electron())
-      window.ipcRenderer.send('close-ws')
+    if (this.is_electron()) window.ipcRenderer.send("close-ws")
   },
   mounted() {
-    if (this.is_electron() && this.connectionStore.ws.enabled)
-      window.ipcRenderer.send('start-ws', this.connectionStore.ws.port)
+    if (this.is_electron() && this.connectionStore.ws.enabled) 
+      window.ipcRenderer.send("start-ws", this.connectionStore.ws.port)
 
     this.$i18n.locale = this.settingsStore.language
     this.settingsStore.$subscribe((language, state) => {
-      this.$i18n.locale = this.settingsStore.language
+        this.$i18n.locale = this.settingsStore.language
     })
   },
-  created() {
-    if (this.is_electron())
-      this.$router.push('/')
-  },
+  methods: {
+    toggleFooter() {
+      this.footer = !this.footer;
+      let el:  HTMLElement | null = document.querySelector("#log-list")
+      let em: HTMLElement | null = document.querySelector(".v-main")
+      let ef: HTMLElement | null = document.querySelector("#app > div > div > footer")
+      let et: HTMLElement | null = document.querySelector(".v-system-bar.systembar")
+      if(et){
+        et.style.display = et.style.display == 'none' ? 'block' : 'none'
+      }
+      if(el && em && ef){
+          if(ef.style.height  != '0px'){
+              ef.style.height = '0'
+              ef.style.padding = '0'
+              em.style.setProperty('margin-bottom', '0');
+              em.style.setProperty('--v-layout-bottom', '0');
+             // el.style.setProperty('--933e9cdf-outer_size', '0');
+          } else {
+              em.style.setProperty('--v-layout-bottom', '60px');
+              //el.style.setProperty('--933e9cdf-outer_size', '55px');
+              ef.style.height = '60px'
+              ef.style.padding = '8px'
+            }
+            //el.scrollTop = el.scrollHeight
+      }
+    },
+  }
 }
 </script>
 
@@ -179,6 +176,9 @@ export default {
   width: 100%;
   height: 100%;
 }
+
+
+<style>
 .corner-button {
   position: fixed;
   top: 0; /* Adjust the top value to your desired position */
