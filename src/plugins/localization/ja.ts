@@ -55,10 +55,7 @@ export default {
       sensitivity_start: 'マイクテスト',
       sensitivity_stop: 'テストを中...',
       device: 'デバイス： ',
-<<<<<<< HEAD
       pinned_languages: 'ピン留めされた言語',
-=======
->>>>>>> d4cb924 (autostart)
       language: 'Speech-to-textの言語を選択',
       unsupported: {
         text: 'Web Speech APIのSpeech-to-Textは{0}で利用できます。(^・ω・^)',
@@ -135,11 +132,8 @@ export default {
       title: 'テキストリプレース',
       description: 'ここで置き換えるテキストを追加します',
       enabled: 'テキストリプレース',
-<<<<<<< HEAD
       match_whole_word: '単語単位',
       match_case: '大文字/小文字を区別',
-=======
->>>>>>> d4cb924 (autostart)
       info: '新しい置き換えを追加する場合は「＋」バタンを使用してください',
       replacing: 'リプレース',
       replacement: 'リプレースメント',
@@ -155,13 +149,10 @@ export default {
       show_original: '翻訳する前に元のテキストを表示する',
       ml_notice: '{0}はCPUを使用して、デバイス上で翻訳を生成する機械学習を搭載したライブラリです。ローエンドのコンピュータでは、うまく動作しない場合があります。',
       speech_lang: 'Speech-to-text言語は',
-<<<<<<< HEAD
       unsupported: {
         text: '翻訳サービスは{0}で利用できます。 (^・ω・^)',
         link: 'デスクトップアプリ版',
       },
-=======
->>>>>>> d4cb924 (autostart)
     },
     connections: {
       title: '接続',

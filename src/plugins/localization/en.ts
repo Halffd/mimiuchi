@@ -55,10 +55,7 @@ export default {
       sensitivity_start: 'Check',
       sensitivity_stop: 'Stop',
       device: 'Listening: ',
-<<<<<<< HEAD
       pinned_languages: 'Pinned languages',
-=======
->>>>>>> d4cb924 (autostart)
       language: 'Select a speech detection language',
       unsupported: {
         text: 'Web Speech API Speech-to-Text is only available on the {0}. (^・ω・^)',
@@ -135,11 +132,8 @@ export default {
       title: 'Word Replace',
       description: 'Add words or phrases to replace here',
       enabled: 'Enable replacing words or phrases',
-<<<<<<< HEAD
       match_whole_word: 'Match whole word only',
       match_case: 'Match case',
-=======
->>>>>>> d4cb924 (autostart)
       info: 'Use the + button to add a new replacement!',
       replacing: 'Replacing',
       replacement: 'Replacement',
@@ -155,13 +149,10 @@ export default {
       show_original: 'Show original phrase before translating',
       ml_notice: '{0} is an ML-powered library that uses local compute resources (CPU) to generate translations on your device. On lower end computers, it might not run well.',
       speech_lang: 'Your Speech-to-text language is ',
-<<<<<<< HEAD
       unsupported: {
         text: 'Translations are currently only available on the {0}. (^・ω・^)',
         link: 'desktop version',
       },
-=======
->>>>>>> d4cb924 (autostart)
     },
     connections: {
       title: 'Connections',

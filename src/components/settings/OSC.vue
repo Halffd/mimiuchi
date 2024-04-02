@@ -12,7 +12,6 @@
         <v-divider />
         <v-col :cols="12">
           <v-card>
-<<<<<<< HEAD
             <v-list-item :title="$t('settings.osc.general.enabled')">
               <template #append>
                 <v-switch
@@ -79,64 +78,6 @@
                 />
               </template>
             </v-list-item>
-=======
-            <v-switch
-              v-model="oscStore.osc_text"
-              :label="$t('settings.osc.general.enabled')"
-              color="primary"
-              hide-details
-              inset
-              class="mx-3"
-            />
-          </v-card>
-
-          <v-card class="mt-2">
-            <v-switch
-              v-model="oscStore.text_typing"
-              :disabled="!oscStore.osc_text"
-              :label="$t('settings.osc.general.typing_indicator')"
-              color="primary"
-              hide-details
-              inset
-              class="mx-3"
-            />
-          </v-card>
-
-          <v-card class="mt-2">
-            <v-switch
-              v-model="oscStore.stt_typing"
-              :disabled="!oscStore.osc_text"
-              :label="$t('settings.osc.general.speech_indicator')"
-              color="primary"
-              hide-details
-              inset
-              class="mx-3"
-            />
-          </v-card>
-
-          <v-card class="mt-2">
-            <v-switch
-              v-model="oscStore.show_keyboard"
-              :disabled="!oscStore.osc_text"
-              :label="$t('settings.osc.general.show_keyboard')"
-              color="primary"
-              hide-details
-              inset
-              class="mx-3"
-            />
-          </v-card>
-
-          <v-card class="mt-2">
-            <v-switch
-              v-model="oscStore.sfx"
-              :disabled="!oscStore.osc_text || oscStore.show_keyboard"
-              :label="$t('settings.osc.general.sfx')"
-              color="primary"
-              hide-details
-              inset
-              class="mx-3"
-            />
->>>>>>> d4cb924 (autostart)
           </v-card>
         </v-col>
       </v-row>

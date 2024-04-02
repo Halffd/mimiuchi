@@ -1,9 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-<<<<<<< HEAD
 import { createRouter, createWebHistory } from 'vue-router'
-=======
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
->>>>>>> d4cb924 (autostart)
 
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'

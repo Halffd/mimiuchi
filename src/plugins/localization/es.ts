@@ -54,10 +54,7 @@ export default {
       sensitivity_start: 'Probar',
       sensitivity_stop: 'Parar',
       device: 'Escuchando: ',
-<<<<<<< HEAD
       pinned_languages: 'Lenguajes fijados',
-=======
->>>>>>> d4cb924 (autostart)
       language: 'Selecciones un lenguaje de escucha',
       unsupported: {
         text: 'Web Speech API (Voz a Texto) solo está disponible en {0}. (^・ω・^)',
@@ -134,11 +131,8 @@ export default {
       title: 'Sustitución de palabras',
       description: 'Agregue palabras o frases para reemplazar aquí',
       enabled: 'Permitir reemplazar palabras o frases',
-<<<<<<< HEAD
       match_whole_word: 'Sólo palabras completas',
       match_case: 'Coincidir mayúsculas/minúsculas',
-=======
->>>>>>> d4cb924 (autostart)
       info: 'Utilice el botón + para agregar un nuevo reemplazo.',
       replacing: 'Reemplazando ',
       replacement: 'Reemplazo',
@@ -154,13 +148,10 @@ export default {
       show_original: 'Mostrar frase original antes de traducir',
       ml_notice: '{0} es una biblioteca basada en ML que utiliza recursos locales (CPU) para generar traducciones en su dispositivo. En dispositivos de gama baja, es posible que no funcione bien.',
       speech_lang: 'Tu lenguaje para Voz a Texto es ',
-<<<<<<< HEAD
       unsupported: {
         text: 'Traducciones solo está disponible en {0}. (^・ω・^)',
         link: 'Aplicación de Escritorio',
       },
-=======
->>>>>>> d4cb924 (autostart)
     },
     connections: {
       title: 'Conexiones',

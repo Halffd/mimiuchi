@@ -172,26 +172,20 @@ export default {
           this.update_available = true
       })
     }
-<<<<<<< HEAD
 
     window.addEventListener('keydown', this.handleKeyDown)
   },
   unmounted() {
     window.removeEventListener('keydown', this.handleKeyDown)
-=======
->>>>>>> d4cb924 (autostart)
   },
   methods: {
     open_external(link: string) {
       window.open(link, '_blank')
     },
-<<<<<<< HEAD
     handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape')
         this.$router.push({ path: '/' })
     },
-=======
->>>>>>> d4cb924 (autostart)
   },
 }
 </script>
