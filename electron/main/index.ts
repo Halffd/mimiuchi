@@ -48,14 +48,12 @@ let wss: any
 
 const window_config: any = {
   title: 'Main window',
-  width: 800,
-  height: 600,
+  width: 1000,
+  height: 700,
   icon: join(process.env.PUBLIC, 'favicon.ico'),
   frame: false,
-  titleBarStyle: 'hidden',
   webPreferences: {
-    preload,    
-    devTools: false,
+    preload,
     // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
     // Consider using contextBridge.exposeInMainWorld
     // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
@@ -74,7 +72,7 @@ async function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(url)
     // Open devTool if the app is not packaged
-    // win.webContents.openDevTools()
+    win.webContents.openDevTools()
   }
   else {
     // win.removeMenu()
@@ -93,7 +91,6 @@ async function createWindow() {
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
-  win.getFocusedWindow().setWindowStyle('hidden');
 
   win.on('maximize', () => win.webContents.send('maximized_state', true))
   win.on('unmaximize', () => win.webContents.send('maximized_state', false))
