@@ -3,11 +3,7 @@
     <div>
       <a
         v-for="log in logs"
-<<<<<<< HEAD
         :class="{ 'fade-out': log.hide, 'final-text': log.isFinal || log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
-=======
-        :class="{ 'fade-out': log.hide, 'final-text': log.isFinal && log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
->>>>>>> d4cb924 (autostart)
       >
         <a v-if="log.hide !== 2">{{ (translationStore.enabled && (log.translation || !translationStore.show_original)) ? log.translation : log.transcript }}&nbsp;&nbsp;</a>
         <v-expand-transition v-show="log.pause">
@@ -41,17 +37,6 @@ export default {
   name: 'Home',
   components: {
     WelcomeOverlay,
-  },
-  
-  props: {
-    isElectron: {
-      type: Boolean,
-      required: false
-    },
-    footer: {
-      type: Boolean,
-      required: true
-    }
   },
   setup() {
     const { height } = useDisplay()
@@ -115,9 +100,7 @@ export default {
     }
   },
   computed: {
-    outer_size() {
-      return this.footer ? (is_electron() ? '90px' : '55px') : '0px'
-    },
+    outer_size: () => is_electron() ? '90px' : '55px',
   },
   mounted() {
     this.overlay_main = this.settingsStore.welcome
