@@ -38,6 +38,16 @@ export default {
   components: {
     WelcomeOverlay,
   },
+  props: {
+    isElectron: {
+      type: Boolean,
+      required: false
+    },
+    footer: {
+      type: Boolean,
+      required: true
+    }
+  },
   setup() {
     const { height } = useDisplay()
 
@@ -100,7 +110,9 @@ export default {
     }
   },
   computed: {
-    outer_size: () => is_electron() ? '90px' : '55px',
+    outer_size() {
+      return this.footer ? (is_electron() ? '90px' : '55px') : '0px'
+    },
   },
   mounted() {
     this.overlay_main = this.settingsStore.welcome

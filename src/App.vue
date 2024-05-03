@@ -111,7 +111,7 @@ export default {
       let ef: HTMLElement | null = document.querySelector("#app > div > div > footer")
       let ee: HTMLElement | null = this.is_electron() ? document.querySelector("#app > div > div > div") : null
       if(ee){
-        if(ee.style.display != 'none'){
+        if(ee.style.display != 'nonn'){
           ee.style.display = 'none'
         } else {
           ee.style.display = 'block'
@@ -190,7 +190,7 @@ export default {
 .corner-button {
   position: fixed;
   top: 0; /* Adjust the top value to your desired position */
-  left: 0; /* Adjust the right value to your desired position */
+  right: 0; /* Adjust the right value to your desired position */
   transform: scale(0.5);
 }
 </style>
