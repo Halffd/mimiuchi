@@ -427,7 +427,7 @@ for (let c of links) {
 
         auto(speechStore: any, lang?: string, on?: boolean): any {
             lang = lang ?? 'ja-JP'
-            console.log(lang, speechStore);
+        //    console.log(lang, speechStore);
             speechStore.stt.language = lang
             let r = true
             if (!this.defaultStore.speech.listening) {
@@ -441,7 +441,7 @@ for (let c of links) {
             return r
         },
         handleHotkey(event: KeyboardEvent) {
-            console.log(event, this);
+        //    console.log(event, this);
 
             // Check the event key to determine the triggered hotkey
             if (event.key === 'Enter') {
