@@ -83,7 +83,7 @@ export default {
   },
   data() {
     return {
-      footer: true
+      footer: true,
     };
   },
   created() {

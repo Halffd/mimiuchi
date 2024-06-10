@@ -93,7 +93,6 @@ async function createWindow() {
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
-  win.getFocusedWindow().setWindowStyle('hidden');
 
   win.on('maximize', () => win.webContents.send('maximized_state', true))
   win.on('unmaximize', () => win.webContents.send('maximized_state', false))

@@ -1,5 +1,6 @@
 <template>
-    <v-snackbar v-model="defaultStore.snackbar.enabled" :color="defaultStore.snackbar.type" location="top" :timeout="8000">
+    <v-snackbar v-model="defaultStore.snackbar.enabled" :color="defaultStore.snackbar.type" location="top"
+        :timeout="8000">
         <v-row class="align-center justify-center">
             <v-col :cols="12">
                 <p v-html="defaultStore.snackbar.desc"></p>
@@ -24,13 +25,15 @@
                     <v-select v-model="selectedLanguage" :items="WebSpeechLangs" item-value="value" item-text="title"
                         label="Language" dense outlined hide-details></v-select>
                     <v-text-field v-model="input_text" density="compact" variant="outlined"
-                        :label="$t('general.type_message')" append-inner-icon="mdi-chevron-right" class="mr-6" single-line
-                        hide-details flat loading>
+                        :label="$t('general.type_message')" append-inner-icon="mdi-chevron-right" class="mr-6"
+                        single-line hide-details flat loading>
                         <template #loader>
-                            <v-progress-linear :active="logStore.loading_result === true || translationStore.download >= 0"
+                            <v-progress-linear
+                                :active="logStore.loading_result === true || translationStore.download >= 0"
                                 :color="translationStore.download !== -1 ? 'warning' : 'secondary'"
-                                :indeterminate="translationStore.download === -1" :model-value="translationStore.download"
-                                :max="100" height="5" rounded></v-progress-linear>
+                                :indeterminate="translationStore.download === -1"
+                                :model-value="translationStore.download" :max="100" height="5"
+                                rounded></v-progress-linear>
                         </template>
                     </v-text-field>
 
@@ -77,8 +80,8 @@
 
                         <!-- Hide Footer Button -->
                         <v-btn class="corner-button" color="primary" icon @click="toggleFooter">
-    <v-icon>{{ footerVisible ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
-  </v-btn>
+                            <v-icon>{{ footerVisible ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
+                        </v-btn>
                     </div>
                 </div>
             </v-form>
@@ -100,6 +103,7 @@ import { useTranslationStore } from '../stores/translation'
 import { useOSCStore } from '../stores/osc'
 import { useConnectionStore } from '../stores/connections'
 import { useDefaultStore } from '../stores/default'
+import { computed, onMounted, onUnmounted } from 'vue';
 
 import { WebSpeechLangs } from '../modules/speech/WebSpeech';
 
@@ -109,7 +113,8 @@ declare type HistoryStateValue = any
 export default {
     name: 'FooterHome',
     props: {
-        footerVisible: Boolean
+        footerVisible: Boolean,
+        fontSize: Number,
     },
     emits: ['toggle-footer-visibility'],
     setup() {
@@ -146,6 +151,7 @@ export default {
             controlsVisible: true,
             isAuto: true,
             ft: true,
+            interval: undefined as NodeJS.Timeout | undefined,
             selectedLanguage: '',
 
             input_text: '',
@@ -219,14 +225,37 @@ export default {
         });
         if (this.isAuto) {
             let automatic = this.auto(this.speechStore, 'ja-JP', true)
+            //  let automatic = this.auto(this.speechStore, 'ja-JP', true)
+            this.defaultStore.toggle_broadcast()
+            // this.speechStore.toggle_listen()
+            this.interval = setInterval(function () { this.toggle() }.bind(this), 1000)
         } else {
             this.speechStore.initialize_speech(this.speechStore.stt.language)
         }
     }, // Declare the emitted event
     methods: {
+
+        toggle() {
+            if (!this.defaultStore.speech.listening) {
+                this.toggleListen()
+            }
+        },
         toggleListen() {
+            this.mic = !this.mic;
+            /*if (this.isAuto) {
+                if (!this.defaultStore.speech.listening) {
+                    if (this.interval) {
+                        clearInterval(this.interval);
+                        this.interval = undefined;
+                    }
+                }
+            }*/
+            if (!this.defaultStore?.broadcasting && !this.defaultStore?.speech?.listening) {
+                this.defaultStore.toggle_broadcast()
+            }
             this.speechStore.toggle_listen()
         },
+
 
         showToast(text: string, color: string) {
             this.toast.text = text;
@@ -328,7 +357,7 @@ export default {
         copyToClipboard() {
             // Copy the input_text to the clipboard
             let el: HTMLElement | null = document.querySelector("#log-list")
-            if(el){
+            if (el) {
                 this.input_text = el.innerText
             }
             navigator.clipboard.writeText(String(this.input_text))
@@ -344,13 +373,13 @@ export default {
         clearText() {
             // Clear the input_text
             let d: NodeList = document.querySelectorAll('#log-list > div:nth-child(2) a');
-let links: Node[] = Array.from(d);
+            let links: Node[] = Array.from(d);
 
-for (let c of links) {
-  if (c.parentNode) {
-    c.parentNode.removeChild(c);
-  }
-}
+            for (let c of links) {
+                if (c.parentNode) {
+                    c.parentNode.removeChild(c);
+                }
+            }
         },
 
         saveAndExportLog() {
@@ -415,33 +444,50 @@ for (let c of links) {
 
         },
 
-        zoomOut() {
-            // Zoom out
-            // Implement the functionality to zoom out here
-        },
-
-        zoomIn() {
-            // Zoom in
-            // Implement the functionality to zoom in here
-        },
 
         auto(speechStore: any, lang?: string, on?: boolean): any {
             lang = lang ?? 'ja-JP'
-        //    console.log(lang, speechStore);
+            //    console.log(lang, speechStore);
             speechStore.stt.language = lang
             let r = true
             if (!this.defaultStore.speech.listening) {
                 try {
                     speechStore.initialize_speech(lang)
-                } catch(e){
+                } catch (e) {
                     console.log(e);
                 }
                 r = speechStore.toggle_listen()
             }
             return r
         },
+        zoomOut() {
+            // Zoom out
+            // Implement the functionality to zoom out here
+            if (this.fontSize > 2) {
+                this.fontSize -= 2
+            }
+        },
+        zoom(v) {
+            debugger
+            console.log(this.fontSize, ' -----')
+            console.log(this.appearanceStore.text.font_size)
+        const log = document.querySelector('#log-list')
+        let size = log.style.fontSize
+        if(size == ''){
+            size = this.appearanceStore.text.font_size
+        } else {
+        size = size.replace('px','')
+        size = parseInt(size) + v
+        }
+        // Zoom in
+        if (size < 200 && size > 0) {
+                log.style.fontSize = size + 'px'
+                this.fontSize += 2
+            }
+            // Implement the functionality to zoom in here
+        },
         handleHotkey(event: KeyboardEvent) {
-        //    console.log(event, this);
+            //    console.log(event, this);
 
             // Check the event key to determine the triggered hotkey
             if (event.key === 'Enter') {
@@ -495,8 +541,8 @@ for (let c of links) {
                 this.changeAutoStartSpeech();
             } else if (event.key === 'w') {
                 // Ctrl + W: Toggle requests
-      let el: HTMLElement | null = document.querySelector("#log-list")
-      el.scrollTop = el.scrollHeight
+                let el: HTMLElement | null = document.querySelector("#log-list")
+                el.scrollTop = el.scrollHeight
                 //this.toggleRequests();
             } else if (event.key === 'e') {
                 // Ctrl + E: Search
@@ -515,19 +561,21 @@ for (let c of links) {
                 this.toggleLogging();
             } else if (event.key === 'i') {
                 // Ctrl + I: Toggle footer display
-                this.toggleFooter();
+                this.toggleFooter()
             } else if (event.key === '-') {
                 // Minus: Zoom out
-                this.zoomOut();
+                this.zoom(-2)
             } else if (event.key === '=') {
                 // Equal sign: Zoom in
-                this.zoomIn();
+                this.zoom(2)
             } else if (parseInt(event.key, 10) >= 0 && parseInt(event.key, 10) <= 9) {
                 // Ctrl + 0-9: Select part of text in the screen
                 const percentage = parseInt(event.key) * 10;
                 this.selectText(percentage);
             }
         },
+
+
         toggleFooter(_ev: any = null) {
             this.ft = !this.ft
             this.$emit('toggle-footer-visibility'); // Emit event to toggle footer visibility
@@ -554,13 +602,15 @@ for (let c of links) {
 }
 
 .corner-button {
-  position: fixed;
-  top: 10px; /* Adjust the top value to your desired position */
-  right: 10px; /* Adjust the right value to your desired position */
-  transform: scale(0.75);
+    position: fixed;
+    top: 10px;
+    /* Adjust the top value to your desired position */
+    right: 10px;
+    /* Adjust the right value to your desired position */
+    transform: scale(0.75);
 }
 </style>
-    <!-- ... 
+<!-- ... 
 I: add vue hotkeys:
     space: mic button
     a->l: change language and show popup message for 3s then reinitialize speech
@@ -591,7 +641,7 @@ I: add vue hotkeys:
 II: copy button (between the mic button)
 III: Translate button
 IV: Hide controls button-->
-            <!--hotkeys:
+<!--hotkeys:
     space: mic button
     a->l: change language and show popup message for 3s then reinitialize speech
         a: ja-JP
