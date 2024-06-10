@@ -152,7 +152,9 @@ export default {
             isAuto: true,
             ft: true,
             interval: undefined as NodeJS.Timeout | undefined,
+            bInterval: undefined as NodeJS.Timeout | undefined,
             selectedLanguage: '',
+            def: '',
 
             input_text: '',
             typing_limited: false,
@@ -224,11 +226,13 @@ export default {
             this.toggleFooter(ev);
         });
         if (this.isAuto) {
-            let automatic = this.auto(this.speechStore, 'ja-JP', true)
-            //  let automatic = this.auto(this.speechStore, 'ja-JP', true)
+            let automatic = this.auto(this.speechStore, this.def, true)
             this.defaultStore.toggle_broadcast()
             // this.speechStore.toggle_listen()
+            if(!is_electron()){
             this.interval = setInterval(function () { this.toggle() }.bind(this), 1000)
+            this.bInterval = setInterval(function () { this.autoBroadcast() }.bind(this), 1000)
+            }
         } else {
             this.speechStore.initialize_speech(this.speechStore.stt.language)
         }
@@ -236,364 +240,381 @@ export default {
     methods: {
 
         toggle() {
-            if (!this.defaultStore.speech.listening) {
-                this.toggleListen()
-            }
-        },
-        toggleListen() {
-            this.mic = !this.mic;
-            /*if (this.isAuto) {
-                if (!this.defaultStore.speech.listening) {
-                    if (this.interval) {
-                        clearInterval(this.interval);
-                        this.interval = undefined;
-                    }
-                }
-            }*/
-            if (!this.defaultStore?.broadcasting && !this.defaultStore?.speech?.listening) {
-                this.defaultStore.toggle_broadcast()
-            }
-            this.speechStore.toggle_listen()
-        },
-
-
-        showToast(text: string, color: string) {
-            this.toast.text = text;
-            this.toast.color = color;
-            this.toast.show = true;
-        },
-        typing_event(event: boolean) {
-            this.speechStore.typing_event(event)
-        },
-        paramTrigger(input: string) {
-            // console.log(window.process.type)
-            if (this.defaultStore.broadcasting && is_electron()) {
-                // if custom params
-                // potential addition:
-                // use https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/search
-                // to see which assign is the closest to the keyword found
-                // unless switch to nlp first.....
-                if (this.oscStore.osc_params.length) {
-                    this.oscStore.osc_params.forEach(custom_param => {
-                        let matchesKey = null
-
-                        custom_param.keywords.forEach(keyword => {
-                            const key_check = `(^|\\s)(${keyword.text})($|[^a-zA-Z\\d])`
-                            const reKey = new RegExp(key_check, "ig")
-                            matchesKey = reKey.exec(input)
-                        })
-
-                        if (matchesKey) {
-                            custom_param.assigns.forEach(assign => {
-                                const assign_check = `(^|\\s)(${assign.keyword})($|[^a-zA-Z\\d])`
-                                const reAssign = new RegExp(assign_check, "ig")
-                                const matchesAssign = reAssign.exec(input)
-                                if (matchesAssign) {
-                                    this.show_snackbar('secondary', `<code>${custom_param.route} = ${assign.set}</code>`)
-                                    window.ipcRenderer.send("send-param-event", { ip: custom_param.ip, port: custom_param.port, route: custom_param.route, value: assign.set })
-                                }
-                            })
-                        }
-                    })
+        if (!this.defaultStore.speech.listening) {
+            this.toggleListen()
+        }
+    },
+    toggleListen() {
+        this.mic = !this.mic;
+        if (this.isAuto) {
+            if (this.defaultStore.speech.listening) {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = undefined;
                 }
             }
-        },
-        onSubmit(log: Log | null = null) {
-            if (log && !log.transcript) return
-
-            if (!log)
-                log = {
-                    transcript: this.input_text,
-                    isFinal: true,
-                    isTranslationFinal: false,
-                    translate: false,
-                    hide: 0 // 1 = fade, 2 = hide
-                }
-            if (log.isFinal) this.paramTrigger(log.transcript)
-            this.speechStore.on_submit(log, Math.max(this.logStore.logs.length - 1, 0))
-
-            // clear chatbox
-            this.input_text = ''
-        },
-        toggleBroadcast() {
+        }
+        if (!this.defaultStore?.broadcasting && !this.defaultStore?.speech?.listening) {
             this.defaultStore.toggle_broadcast()
-        },
-        show_snackbar(type: string, desc: string) {
-            this.defaultStore.snackbar.desc = desc
-            this.defaultStore.snackbar.type = type
-            this.defaultStore.snackbar.enabled = true
-        },
-        onResize() {
-            this.windowSize = { x: window.innerWidth, y: window.innerHeight }
-        },
-
-        toggleMic() {
-            // Implement functionality for toggling the mic button
-        },
-        changeLanguage(language: string) {
-
-            // Call the auto function to change the language and toggle the listen mode
-            //debugger;
-            const result = this.auto(this.speechStore, language, true);
-
-            // Show a popup message for 3 seconds
-            if (result) {
-                // Show success message
-                this.showToast('Language changed successfully to ' + language, 'success');
-            } else {
-                // Show error message
-                this.showToast('Failed to change language.', 'error');
-            }
-        },
-        translateText() {
-            // Implement translation functionality here
-            // You can use a translation API or library of your choice
-        },
-
-        toggleControls() {
-            this.controlsVisible = !this.controlsVisible;
-        },
-
-        copyToClipboard() {
-            // Copy the input_text to the clipboard
-            let el: HTMLElement | null = document.querySelector("#log-list")
-            if (el) {
-                this.input_text = el.innerText
-            }
-            navigator.clipboard.writeText(String(this.input_text))
-                .then(() => {
-                    this.showToast('Text copied to clipboard.', 'success');
-                })
-                .catch((error) => {
-                    console.error('Failed to copy text to clipboard:', error);
-                    this.showToast('Failed to copy text to clipboard.', 'error');
-                });
-        },
-
-        clearText() {
-            // Clear the input_text
-            let d: NodeList = document.querySelectorAll('#log-list > div:nth-child(2) a');
-            let links: Node[] = Array.from(d);
-
-            for (let c of links) {
-                if (c.parentNode) {
-                    c.parentNode.removeChild(c);
+        }
+        this.speechStore.toggle_listen()
+        if (this.isAuto && this.defaultStore.speech.listening) {
+            this.interval = setInterval(function () { this.toggle() }.bind(this), 1000)
+        }
+        console.log(this.interval);
+    },
+    autoBroadcast() {
+        if (!this.defaultStore?.broadcasting) {
+            this.defaultStore.toggle_broadcast()
+        } 
+        if (this.isAuto) {
+            if (this.defaultStore.broadcasting) {
+                if (this.bInterval) {
+                    clearInterval(this.bInterval);
+                    this.bInterval = undefined;
                 }
             }
-        },
+        }
+    },
+    showToast(text: string, color: string) {
+        this.toast.text = text;
+        this.toast.color = color;
+        this.toast.show = true;
+    },
+    typing_event(event: boolean) {
+        this.speechStore.typing_event(event)
+    },
+    paramTrigger(input: string) {
+        // console.log(window.process.type)
+        if (this.defaultStore.broadcasting && is_electron()) {
+            // if custom params
+            // potential addition:
+            // use https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/search
+            // to see which assign is the closest to the keyword found
+            // unless switch to nlp first.....
+            if (this.oscStore.osc_params.length) {
+                this.oscStore.osc_params.forEach(custom_param => {
+                    let matchesKey = null
 
-        saveAndExportLog() {
-            // Save and export the log
-            // Implement the functionality to save and export the log here
-        },
+                    custom_param.keywords.forEach(keyword => {
+                        const key_check = `(^|\\s)(${keyword.text})($|[^a-zA-Z\\d])`
+                        const reKey = new RegExp(key_check, "ig")
+                        matchesKey = reKey.exec(input)
+                    })
 
-        changeAutoStartSpeech() {
-            // Change auto start speech setting
-            this.isAuto = !this.isAuto;
-            if (this.isAuto) {
-                this.auto(this.speechStore, String(this.selectedLanguage), true);
-                this.showToast('Auto start speech enabled.', 'success');
-            } else {
-                this.speechStore.toggle_listen()
-                this.showToast('Auto start speech disabled.', 'success');
+                    if (matchesKey) {
+                        custom_param.assigns.forEach(assign => {
+                            const assign_check = `(^|\\s)(${assign.keyword})($|[^a-zA-Z\\d])`
+                            const reAssign = new RegExp(assign_check, "ig")
+                            const matchesAssign = reAssign.exec(input)
+                            if (matchesAssign) {
+                                this.show_snackbar('secondary', `<code>${custom_param.route} = ${assign.set}</code>`)
+                                window.ipcRenderer.send("send-param-event", { ip: custom_param.ip, port: custom_param.port, route: custom_param.route, value: assign.set })
+                            }
+                        })
+                    }
+                })
             }
-        },
+        }
+    },
+    onSubmit(log: Log | null = null) {
+        if (log && !log.transcript) return
 
-        selectText(percentage: number) {
-            // Select a part of the text based on the percentage
-            const textLength = this.input_text.length;
-            const startIndex = Math.floor((percentage / 100) * textLength);
-            const endIndex = Math.floor(((percentage + 10) / 100) * textLength);
-            const selectedText = this.input_text.substring(startIndex, endIndex);
-            console.log('Selected Text:', selectedText);
-        },
+        if (!log)
+            log = {
+                transcript: this.input_text,
+                isFinal: true,
+                isTranslationFinal: false,
+                translate: false,
+                hide: 0 // 1 = fade, 2 = hide
+            }
+        if (log.isFinal) this.paramTrigger(log.transcript)
+        this.speechStore.on_submit(log, Math.max(this.logStore.logs.length - 1, 0))
 
-        toggleRequests() {
-            // Toggle requests
-            // Implement the functionality to toggle requests here
-        },
+        // clear chatbox
+        this.input_text = ''
+    },
+    toggleBroadcast() {
+        this.defaultStore.toggle_broadcast()
+    },
+    show_snackbar(type: string, desc: string) {
+        this.defaultStore.snackbar.desc = desc
+        this.defaultStore.snackbar.type = type
+        this.defaultStore.snackbar.enabled = true
+    },
+    onResize() {
+        this.windowSize = { x: window.innerWidth, y: window.innerHeight }
+    },
 
-        search() {
-            // Search
-            // Implement the search functionality here
-        },
+    toggleMic() {
+        // Implement functionality for toggling the mic button
+    },
+    changeLanguage(language: string) {
 
-        restart() {
-            // Restart the application
-            // Implement the restart functionality here
-        },
+        // Call the auto function to change the language and toggle the listen mode
+        //debugger;
+        const result = this.auto(this.speechStore, language, true);
 
-        toggleTranslate() {
-            // Toggle translate
-            // Implement the functionality to toggle translate here
-        },
+        // Show a popup message for 3 seconds
+        if (result) {
+            // Show success message
+            this.showToast('Language changed successfully to ' + language, 'success');
+        } else {
+            // Show error message
+            this.showToast('Failed to change language.', 'error');
+        }
+    },
+    translateText() {
+        // Implement translation functionality here
+        // You can use a translation API or library of your choice
+    },
 
-        hideTranslate() {
-            // Hide translate
-            // Implement the functionality to hide translate here
-        },
+    toggleControls() {
+        this.controlsVisible = !this.controlsVisible;
+    },
 
-        toggleLogging() {
-            // Toggle logging
-            // Implement the functionality to toggle logging here
-        },
+    copyToClipboard() {
+        // Copy the input_text to the clipboard
+        let el: HTMLElement | null = document.querySelector("#log-list")
+        if (el) {
+            this.input_text = el.innerText
+        }
+        navigator.clipboard.writeText(String(this.input_text))
+            .then(() => {
+                this.showToast('Text copied to clipboard.', 'success');
+            })
+            .catch((error) => {
+                console.error('Failed to copy text to clipboard:', error);
+                this.showToast('Failed to copy text to clipboard.', 'error');
+            });
+    },
 
-        toggleFooterDisplay() {
-            // Toggle footer display
-            this.$emit('toggle-footer-visibility'); // Emit event to toggle footer visibility
+    clearText() {
+        // Clear the input_text
+        let d: NodeList = document.querySelectorAll('#log-list > div:nth-child(2) a');
+        let links: Node[] = Array.from(d);
 
-        },
+        for (let c of links) {
+            if (c.parentNode) {
+                c.parentNode.removeChild(c);
+            }
+        }
+    },
+
+    saveAndExportLog() {
+        // Save and export the log
+        // Implement the functionality to save and export the log here
+    },
+
+    changeAutoStartSpeech() {
+        // Change auto start speech setting
+        this.isAuto = !this.isAuto;
+        if (this.isAuto) {
+            this.auto(this.speechStore, String(this.selectedLanguage), true);
+            this.showToast('Auto start speech enabled.', 'success');
+        } else {
+            this.speechStore.toggle_listen()
+            this.showToast('Auto start speech disabled.', 'success');
+        }
+    },
+
+    selectText(percentage: number) {
+        // Select a part of the text based on the percentage
+        const textLength = this.input_text.length;
+        const startIndex = Math.floor((percentage / 100) * textLength);
+        const endIndex = Math.floor(((percentage + 10) / 100) * textLength);
+        const selectedText = this.input_text.substring(startIndex, endIndex);
+        console.log('Selected Text:', selectedText);
+    },
+
+    toggleRequests() {
+        // Toggle requests
+        // Implement the functionality to toggle requests here
+    },
+
+    search() {
+        // Search
+        // Implement the search functionality here
+    },
+
+    restart() {
+        // Restart the application
+        // Implement the restart functionality here
+    },
+
+    toggleTranslate() {
+        // Toggle translate
+        // Implement the functionality to toggle translate here
+    },
+
+    hideTranslate() {
+        // Hide translate
+        // Implement the functionality to hide translate here
+    },
+
+    toggleLogging() {
+        // Toggle logging
+        // Implement the functionality to toggle logging here
+    },
+
+    toggleFooterDisplay() {
+        // Toggle footer display
+        this.$emit('toggle-footer-visibility'); // Emit event to toggle footer visibility
+
+    },
 
 
-        auto(speechStore: any, lang?: string, on?: boolean): any {
-            lang = lang ?? 'ja-JP'
+    auto(speechStore: any, lang?: string, on?: boolean): any {
+        if (lang != '') {
+            ang = lang ?? 'ja-JP'
             //    console.log(lang, speechStore);
             speechStore.stt.language = lang
-            let r = true
-            if (!this.defaultStore.speech.listening) {
-                try {
-                    speechStore.initialize_speech(lang)
-                } catch (e) {
-                    console.log(e);
-                }
-                r = speechStore.toggle_listen()
+        }
+        let r = true
+        if (!this.defaultStore.speech.listening) {
+            try {
+                speechStore.initialize_speech(lang)
+            } catch (e) {
+                console.log(e);
             }
-            return r
-        },
-        zoomOut() {
-            // Zoom out
-            // Implement the functionality to zoom out here
-            if (this.fontSize > 2) {
-                this.fontSize -= 2
-            }
-        },
-        zoom(v) {
-            debugger
-            console.log(this.fontSize, ' -----')
-            console.log(this.appearanceStore.text.font_size)
+            r = speechStore.toggle_listen()
+        }
+        return r
+    },
+    zoomOut() {
+        // Zoom out
+        // Implement the functionality to zoom out here
+        if (this.fontSize > 2) {
+            this.fontSize -= 2
+        }
+    },
+    zoom(v) {
+        debugger
+        console.log(this.fontSize, ' -----')
+        console.log(this.appearanceStore.text.font_size)
         const log = document.querySelector('#log-list')
         let size = log.style.fontSize
-        if(size == ''){
+        if (size == '') {
             size = this.appearanceStore.text.font_size
         } else {
-        size = size.replace('px','')
-        size = parseInt(size) + v
+            size = size.replace('px', '')
+            size = parseInt(size) + v
         }
         // Zoom in
         if (size < 200 && size > 0) {
-                log.style.fontSize = size + 'px'
-                this.fontSize += 2
-            }
-            // Implement the functionality to zoom in here
-        },
-        handleHotkey(event: KeyboardEvent) {
-            //    console.log(event, this);
+            log.style.fontSize = size + 'px'
+            this.fontSize += 2
+        }
+        // Implement the functionality to zoom in here
+    },
+    handleHotkey(event: KeyboardEvent) {
+        //    console.log(event, this);
 
-            // Check the event key to determine the triggered hotkey
-            if (event.key === 'Enter') {
-                // Spacebar: mic button
-                event.stopPropagation()
-                this.toggleListen();
-            } else if (event.key === 'a') {
-                // Ctrl + A: Change language to ja-JP
-                this.changeLanguage('ja-JP');
-            } else if (event.key === 's') {
-                // Ctrl + S: Change language to en-US
-                this.changeLanguage('en-US');
-            } else if (event.key === 'd') {
-                // Ctrl + D: Change language to id-ID
-                this.changeLanguage('id-ID');
-            } else if (event.key === 'f') {
-                // Ctrl + F: Change language to zh-CN
-                this.changeLanguage('zh-CN');
-            } else if (event.key === ';') {
-                // Ctrl + F: Change language to zh-CN
-                this.changeLanguage('zh-HK');
-            } else if (event.key === "'") {
-                // Ctrl + F: Change language to zh-CN
-                this.changeLanguage('zh-TW');
-            } else if (event.key === 'g') {
-                // Ctrl + G: Change language to ko-KR
-                this.changeLanguage('ko-KR');
-            } else if (event.key === 'h') {
-                // Ctrl + H: Change language to pt-BR
-                this.changeLanguage('pt-BR');
-            } else if (event.key === 'j') {
-                // Ctrl + J: Change language to es-ME
-                this.changeLanguage('es-ME');
-            } else if (event.key === 'k') {
-                // Ctrl + K: Change language to fr-FR
-                this.changeLanguage('fr-FR');
-            } else if (event.key === 'l') {
-                // Ctrl + L: Change language to it-IT
-                this.changeLanguage('it-IT');
-            } else if (event.key === 'c') {
-                // Ctrl + C: Copy to clipboard
-                this.copyToClipboard();
-            } else if (event.key === 'x') {
-                // Ctrl + X: Clear all text
-                this.clearText();
-            } else if (event.key === 'z') {
-                // Ctrl + Z: Save and export log
-                this.saveAndExportLog();
-            } else if (event.key === 'q') {
-                // Ctrl + Q: Change auto start speech
-                this.changeAutoStartSpeech();
-            } else if (event.key === 'w') {
-                // Ctrl + W: Toggle requests
-                let el: HTMLElement | null = document.querySelector("#log-list")
-                el.scrollTop = el.scrollHeight
-                //this.toggleRequests();
-            } else if (event.key === 'e') {
-                // Ctrl + E: Search
-                this.search();
-            } else if (event.key === 'r') {
-                // Ctrl + R: Restart
-                this.restart();
-            } else if (event.key === 't') {
-                // Ctrl + T: Toggle translate
-                this.toggleTranslate();
-            } else if (event.key === 'y') {
-                // Ctrl + Y: Hide translate
-                this.hideTranslate();
-            } else if (event.key === 'u') {
-                // Ctrl + U: Logging
-                this.toggleLogging();
-            } else if (event.key === 'i') {
-                // Ctrl + I: Toggle footer display
-                this.toggleFooter()
-            } else if (event.key === '-') {
-                // Minus: Zoom out
-                this.zoom(-2)
-            } else if (event.key === '=') {
-                // Equal sign: Zoom in
-                this.zoom(2)
-            } else if (parseInt(event.key, 10) >= 0 && parseInt(event.key, 10) <= 9) {
-                // Ctrl + 0-9: Select part of text in the screen
-                const percentage = parseInt(event.key) * 10;
-                this.selectText(percentage);
-            }
-        },
+        // Check the event key to determine the triggered hotkey
+        if (event.key === 'Enter') {
+            // Spacebar: mic button
+            event.stopPropagation()
+            this.toggleListen();
+        } else if (event.key === 'a') {
+            // Ctrl + A: Change language to ja-JP
+            this.changeLanguage('ja-JP');
+        } else if (event.key === 's') {
+            // Ctrl + S: Change language to en-US
+            this.changeLanguage('en-US');
+        } else if (event.key === 'd') {
+            // Ctrl + D: Change language to id-ID
+            this.changeLanguage('id-ID');
+        } else if (event.key === 'f') {
+            // Ctrl + F: Change language to zh-CN
+            this.changeLanguage('zh-CN');
+        } else if (event.key === ';') {
+            // Ctrl + F: Change language to zh-CN
+            this.changeLanguage('zh-HK');
+        } else if (event.key === "'") {
+            // Ctrl + F: Change language to zh-CN
+            this.changeLanguage('zh-TW');
+        } else if (event.key === 'g') {
+            // Ctrl + G: Change language to ko-KR
+            this.changeLanguage('ko-KR');
+        } else if (event.key === 'h') {
+            // Ctrl + H: Change language to pt-BR
+            this.changeLanguage('pt-BR');
+        } else if (event.key === 'j') {
+            // Ctrl + J: Change language to es-ME
+            this.changeLanguage('es-ME');
+        } else if (event.key === 'k') {
+            // Ctrl + K: Change language to fr-FR
+            this.changeLanguage('fr-FR');
+        } else if (event.key === 'l') {
+            // Ctrl + L: Change language to it-IT
+            this.changeLanguage('it-IT');
+        } else if (event.key === 'c') {
+            // Ctrl + C: Copy to clipboard
+            this.copyToClipboard();
+        } else if (event.key === 'x') {
+            // Ctrl + X: Clear all text
+            this.clearText();
+        } else if (event.key === 'z') {
+            // Ctrl + Z: Save and export log
+            this.saveAndExportLog();
+        } else if (event.key === 'q') {
+            // Ctrl + Q: Change auto start speech
+            this.changeAutoStartSpeech();
+        } else if (event.key === 'w') {
+            // Ctrl + W: Toggle requests
+            let el: HTMLElement | null = document.querySelector("#log-list")
+            el.scrollTop = el.scrollHeight
+            //this.toggleRequests();
+        } else if (event.key === 'e') {
+            // Ctrl + E: Search
+            this.search();
+        } else if (event.key === 'r') {
+            // Ctrl + R: Restart
+            this.restart();
+        } else if (event.key === 't') {
+            // Ctrl + T: Toggle translate
+            this.toggleTranslate();
+        } else if (event.key === 'y') {
+            // Ctrl + Y: Hide translate
+            this.hideTranslate();
+        } else if (event.key === 'u') {
+            // Ctrl + U: Logging
+            this.toggleLogging();
+        } else if (event.key === 'i') {
+            // Ctrl + I: Toggle footer display
+            this.toggleFooter()
+        } else if (event.key === '-') {
+            // Minus: Zoom out
+            this.zoom(-2)
+        } else if (event.key === '=') {
+            // Equal sign: Zoom in
+            this.zoom(2)
+        } else if (parseInt(event.key, 10) >= 0 && parseInt(event.key, 10) <= 9) {
+            // Ctrl + 0-9: Select part of text in the screen
+            const percentage = parseInt(event.key) * 10;
+            this.selectText(percentage);
+        }
+    },
 
 
-        toggleFooter(_ev: any = null) {
-            this.ft = !this.ft
-            this.$emit('toggle-footer-visibility'); // Emit event to toggle footer visibility
-        },
-        reloadEvents() {
-            if (is_electron()) {
-                window.ipcRenderer.removeListener('websocket-connect')
-                window.ipcRenderer.removeListener('receive-text-event')
-                window.ipcRenderer.receive('websocket-connect', (event: any, data: any) => {
-                    this.defaultStore.broadcasting = event
-                })
-                window.ipcRenderer.receive('receive-text-event', (event: string, data: any) => {
-                    const oevent: Log = JSON.parse(event)
-                    this.onSubmit(oevent)
-                })
-            }
+    toggleFooter(_ev: any = null) {
+        this.ft = !this.ft
+        this.$emit('toggle-footer-visibility'); // Emit event to toggle footer visibility
+    },
+    reloadEvents() {
+        if (is_electron()) {
+            window.ipcRenderer.removeListener('websocket-connect')
+            window.ipcRenderer.removeListener('receive-text-event')
+            window.ipcRenderer.receive('websocket-connect', (event: any, data: any) => {
+                this.defaultStore.broadcasting = event
+            })
+            window.ipcRenderer.receive('receive-text-event', (event: string, data: any) => {
+                const oevent: Log = JSON.parse(event)
+                this.onSubmit(oevent)
+            })
         }
     }
+}
 }
 </script>
 <style>
