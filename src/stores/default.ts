@@ -14,6 +14,7 @@ export const useDefaultStore = defineStore('default', {
     connections: 0,
     typing_limited: false,
     speech: {} as WebSpeech,
+    kuroshiro: {} as Kuroshiro,
     snackbar: {
       enabled: false,
       type: 'error',

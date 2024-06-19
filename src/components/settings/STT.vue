@@ -36,7 +36,7 @@
               hide-details
               readonly
               max="1"
-              height="20"
+              height="20"_
               thumb-size="4"
             >
               <template #prepend>
@@ -63,7 +63,7 @@
 
         <v-col :cols="12">
           <v-radio-group v-if="Object.keys(speechStore.pinned_languages).length > 0" v-model="speechStore.stt.language" :label="$t('settings.stt.pinned_languages')">
-            <v-card v-for="language in speechStore.pinned_languages" class="language-card pa-2 mb-2" :color="language.value === speechStore.stt.language ? 'primary' : 'default'" @click="speechStore.stt.language = language.value">
+            <v-card v-for="language in speechStore.pinnedlanguages" class="language-card pa-2 mb-2" :color="language.value === speechStore.stt.language ? 'primary' : 'default'" @click="speechStore.stt.language = language.value">
               <v-radio :label="language.title" :value="language.value">
                 <template #label>
                   <div class="d-flex flex-grow-1 justify-space-between me-2">
@@ -175,6 +175,10 @@ export default {
       if (language.value === this.speechStore.stt.language)
         this.language_choice = language.value
     })
+    console.log(this.speechStore.pinnedlanguages);
+    console.log(this.languages);
+    console.log(this.language_choice);
+
     this.get_media_devices()
   },
   methods: {

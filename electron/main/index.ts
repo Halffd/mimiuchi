@@ -7,6 +7,14 @@ import { WebSocketServer } from 'ws'
 import { emit_osc, empty_queue } from './modules/osc'
 import { initialize_ws } from './modules/ws'
 import { check_update } from './modules/check_update'
+import Kuroshiro from "kuroshiro";
+// Initialize kuroshiro with an instance of analyzer (You could check the [apidoc](#initanalyzer) for more information):
+// For this example, you should npm install and import the kuromoji analyzer first
+import KuromojiAnalyzer from "kuroshiro-analyzer-mecab";
+
+const kuroshiro = new Kuroshiro();
+kuroshiro.init(new KuromojiAnalyzer());
+const japaneseRegex = /[\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF]+/;
 
 const store = new Store()
 
@@ -170,10 +178,18 @@ ipcMain.on('typing-text-event', (event, args) => {
 
 // event for sending text
 export let text_queue = []
-ipcMain.on('send-text-event', (event, args) => {
+ipcMain.on('send-text-event', async(event, args) => {
   args = JSON.parse(args)
-  const new_text = args.transcript.includes(' ') ? args.transcript.match(/.{1,140}(\s|$)/g) : args.transcript.match(/.{1,140}/g)
+  let new_text = args.transcript.includes(' ') ? args.transcript.match(/.{1,140}(\s|$)/g) : args.transcript.match(/.{1,140}/g)
+  
+  if(japaneseRegex.test(new_text)){
+    console.dir(args)
+    console.log(new_text.length)
+    new_text[0] = await kuroshiro.convert(new_text[0], {mode:"furigana", to:"hiragana"});
+    console.log(new_text)
+  }
   text_queue = [...text_queue, ...new_text]
+
   if (text_queue.length >= 1)
     empty_queue(text_queue, args.hide_ui, args.sfx)
 })

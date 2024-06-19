@@ -26,7 +26,7 @@ export const useAppearanceStore = defineStore('appearance', {
         ],
       },
       font_size: 64,
-      enable_fade: true,
+      enable_fade: false,
       hide_after: 10, // seconds
       fade_time: 4, // seconds
       new_line_delay: 0 as number, // seconds

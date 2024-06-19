@@ -156,11 +156,10 @@ export const useSpeechStore = defineStore('speech', {
           logStore.logs[logStore.logs.length - 1].pause = true
         }, text.new_line_delay * 1000)
       }
-
       // finalized text
       if (log.isFinal) {
         logStore.loading_result = false
-
+        
         // translate if not translating and enabled
         if (is_electron() && translationStore.enabled && !log.translate && !log.translation) {
           logStore.logs[i].translate = true
@@ -177,6 +176,7 @@ export const useSpeechStore = defineStore('speech', {
         // text-to-speech
         if (this.tts.enabled && this.tts.voice)
           this.speak(log.transcript)
+
 
         // fadeout text
         if (text.enable_fade) {
