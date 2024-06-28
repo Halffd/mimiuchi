@@ -385,6 +385,9 @@ export default {
         translateText() {
             // Implement translation functionality here
             // You can use a translation API or library of your choice
+            makeFurigana("自転車に乗ります").then((res) => {
+                console.log(res)
+            })
         },
 
         toggleControls() {

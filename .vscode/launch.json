@@ -22,7 +22,7 @@
   "configurations": [
     {
       "name": "Attach to Chrome",
-      "port": 9222,
+      "port": 5133,
       "request": "attach",
       "url": "http://localhost:5173/",
       "type": "chrome",

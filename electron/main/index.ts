@@ -1,23 +1,21 @@
 import { join } from 'node:path'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 
+import kuromoji from 'kuromoji'
 import Store from 'electron-store'
 
 import { WebSocketServer } from 'ws'
-import { kuromoji } from 'kuromoji'
 import { emit_osc, empty_queue } from './modules/osc'
 import { initialize_ws } from './modules/ws'
 import { check_update } from './modules/check_update'
 
-var token
-kuromoji.builder({ dicPath: "../../node_modules/kuromoji/dict/cc.dat.gz" }).build(function (err, tokenizer) {
-  // tokenizer is ready
-  token = tokenizer
-
-  var path = tokenizer.tokenize("すもももももももものうち");
-console.log(path);
-
-});
+let tokenizer = null
+kuromoji.builder({ dicPath: 'lib/dict' }).build((err, res) => {
+  if (err) {
+    console.log(err)
+  }
+  tokenizer = res
+})
 const japaneseRegex = /[\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF]+/;
 
 const store = new Store()
@@ -187,12 +185,17 @@ ipcMain.on('send-text-event', async(event, args) => {
   let new_text = args.transcript.includes(' ') ? args.transcript.match(/.{1,140}(\s|$)/g) : args.transcript.match(/.{1,140}/g)
   
   if(japaneseRegex.test(new_text)){
-    console.dir(args)
-    console.log(new_text.length)
-    let tokens = token.tokenize(new_text[0])
+    //console.dir(args)
+    //console.log(new_text.length)
+    
+    const tokens = tokenizer.tokenize(new_text[0]);
+    const furigana = [];
+    for (const token of tokens) {
+      furigana.push(token.basic_form, token.reading)
+    }
+    console.log(furigana)
     //new_text[0] = await kuroshiro.convert(new_text[0], {mode:"furigana", to:"hiragana"});
-    console.log(tokens)
-    console.log(new_text)
+    //console.log(new_text)
   }
   text_queue = [...text_queue, ...new_text]
 

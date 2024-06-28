@@ -19,6 +19,7 @@ export default defineConfig(({ command }) => {
 
   return {
     base: './',
+    publicDir: 'lib',
     define: {
       __APP_NAME__: JSON.stringify('mimiuchi'),
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
@@ -41,6 +42,7 @@ export default defineConfig(({ command }) => {
               sourcemap,
               minify: isBuild,
               outDir: 'dist-electron/main',
+              publicDir: 'lib',
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },
@@ -59,6 +61,7 @@ export default defineConfig(({ command }) => {
               sourcemap: sourcemap ? 'inline' : undefined, // #332
               minify: isBuild,
               outDir: 'dist-electron/preload',
+              publicDir: 'lib',
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },

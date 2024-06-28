@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useSettingsStore = defineStore('settings', {
   state: () => ({
 
-    welcome: true,
+    welcome: true,  
 
     language: navigator.language.split('-')[0],
 
