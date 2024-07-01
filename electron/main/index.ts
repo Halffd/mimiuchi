@@ -1,22 +1,12 @@
 import { join } from 'node:path'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 
-import kuromoji from 'kuromoji'
 import Store from 'electron-store'
 
 import { WebSocketServer } from 'ws'
 import { emit_osc, empty_queue } from './modules/osc'
 import { initialize_ws } from './modules/ws'
 import { check_update } from './modules/check_update'
-
-let tokenizer = null
-kuromoji.builder({ dicPath: 'lib/dict' }).build((err, res) => {
-  if (err) {
-    console.log(err)
-  }
-  tokenizer = res
-})
-const japaneseRegex = /[\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF]+/;
 
 const store = new Store()
 
@@ -64,7 +54,7 @@ const window_config: any = {
   frame: false,
   titleBarStyle: 'hidden',
   webPreferences: {
-    preload,    
+    preload,
     devTools: false,
     // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
     // Consider using contextBridge.exposeInMainWorld
@@ -180,23 +170,10 @@ ipcMain.on('typing-text-event', (event, args) => {
 
 // event for sending text
 export let text_queue = []
-ipcMain.on('send-text-event', async(event, args) => {
+ipcMain.on('send-text-event', async (event, args) => {
   args = JSON.parse(args)
-  let new_text = args.transcript.includes(' ') ? args.transcript.match(/.{1,140}(\s|$)/g) : args.transcript.match(/.{1,140}/g)
-  
-  if(japaneseRegex.test(new_text)){
-    //console.dir(args)
-    //console.log(new_text.length)
-    
-    const tokens = tokenizer.tokenize(new_text[0]);
-    const furigana = [];
-    for (const token of tokens) {
-      furigana.push(token.basic_form, token.reading)
-    }
-    console.log(furigana)
-    //new_text[0] = await kuroshiro.convert(new_text[0], {mode:"furigana", to:"hiragana"});
-    //console.log(new_text)
-  }
+  const new_text = args.transcript.includes(' ') ? args.transcript.match(/.{1,140}(\s|$)/g) : args.transcript.match(/.{1,140}/g)
+
   text_queue = [...text_queue, ...new_text]
 
   if (text_queue.length >= 1)
