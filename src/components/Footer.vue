@@ -510,7 +510,6 @@ export default {
             }
         },
         zoom(v) {
-            debugger
             console.log(this.fontSize, ' -----')
             console.log(this.appearanceStore.text.font_size)
             const log = document.querySelector('#log-list')

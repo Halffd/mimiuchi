@@ -117,7 +117,31 @@ function initialize_ws(win: any, wss: any, port: number) {
     wss.on('connection', (ws) => {
       ws.on('message', (message) => {
         message = JSON.parse(message)
-
+        if (message.data.transcript.length > 0) {
+          try {
+            if (japaneseRegex.test(message.data.transcript)) {
+              const tokens = tokenizer.tokenize(message.data.transcript)
+              let furigana = ''
+              for (const token of tokens) {
+                if (japaneseRegex.test(token.basic_form)) {
+                  const hiragana = katakanaToHiragana(token.reading)
+                  if (hiragana.endsWith('ッ')) {
+                    hiragana = hiragana.slice(0, -1)
+                  }
+                  const word = token.basic_form !== token.reading
+                    && token.basic_form !== hiragana
+                    ? `${token.basic_form}[${hiragana}]`
+                    : token.basic_form
+                  furigana += word
+                }
+              }
+              message.data.transcript = furigana
+            }
+          }
+          catch (error) {
+            console.error(error)
+          }
+        }
         console.log(`WS => ${message.type}`)
 
         if (message.type === 'command') {
@@ -138,24 +162,6 @@ function initialize_ws(win: any, wss: any, port: number) {
         }
         else if (message.type === 'text') {
           if (message.data.transcript.length > 0) {
-            try {
-              if (japaneseRegex.test(message.data.transcript)) {
-                const tokens = tokenizer.tokenize(message.data.transcript)
-                let furigana = ''
-                for (const token of tokens) {
-                  const hiragana = katakanaToHiragana(token.reading)
-                  const word = token.basic_form !== token.reading
-                    && token.basic_form !== hiragana
-                    ? `${token.basic_form}[${hiragana}]`
-                    : token.basic_form
-                  furigana += word
-                }
-                message.data.transcript = furigana
-              }
-            }
-            catch (error) {
-              console.error(error);
-            }
             win.webContents.send('receive-text-event', JSON.stringify(message.data))
           }
         }
