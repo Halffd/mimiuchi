@@ -123,17 +123,15 @@ function initialize_ws(win: any, wss: any, port: number) {
               const tokens = tokenizer.tokenize(message.data.transcript)
               let furigana = ''
               for (const token of tokens) {
-                if (japaneseRegex.test(token.basic_form)) {
-                  const hiragana = katakanaToHiragana(token.reading)
-                  if (hiragana.endsWith('ッ')) {
-                    hiragana = hiragana.slice(0, -1)
-                  }
-                  const word = token.basic_form !== token.reading
-                    && token.basic_form !== hiragana
-                    ? `${token.basic_form}[${hiragana}]`
-                    : token.basic_form
-                  furigana += word
-                }
+                const hiragana = katakanaToHiragana(token.reading)
+                if (hiragana.endsWith('ッ'))
+                  hiragana = hiragana.slice(0, -1)
+
+                const word = token.basic_form !== token.reading
+                  && token.basic_form !== hiragana && japaneseRegex.test(token.basic_form)
+                  ? `${token.basic_form}[${hiragana}]`
+                  : token.basic_form
+                furigana += word
               }
               message.data.transcript = furigana
             }
@@ -161,9 +159,8 @@ function initialize_ws(win: any, wss: any, port: number) {
           }
         }
         else if (message.type === 'text') {
-          if (message.data.transcript.length > 0) {
+          if (message.data.transcript.length > 0)
             win.webContents.send('receive-text-event', JSON.stringify(message.data))
-          }
         }
       })
       ws.send(`{"event": "connect", "msg":"connected to websocket ( •̀ ω •́ )", "version":"${pkg.version}"}`)
