@@ -11,6 +11,9 @@ kuromoji.builder({ dicPath: 'lib/dict' }).build((err, res) => {
 })
 const japaneseRegex = /[\u4E00-\u9FFF]/
 function katakanaToHiragana(input: string): string {
+  if (typeof input !== 'string' || !input.hasOwnProperty('length') || input.trim().length === 0)
+    return input
+
   const katakanaToHiraganaMap: { [key: string]: string } = {
     ア: 'あ',
     イ: 'い',
@@ -119,21 +122,26 @@ function initialize_ws(win: any, wss: any, port: number) {
         message = JSON.parse(message)
         if (message.data.transcript.length > 0) {
           try {
-            if (japaneseRegex.test(message.data.transcript)) {
-              const tokens = tokenizer.tokenize(message.data.transcript)
+            if (japaneseRegex && japaneseRegex.test(message?.data?.transcript)) {
+              const tokens = tokenizer?.tokenize(message?.data?.transcript)
               let furigana = ''
-              for (const token of tokens) {
-                const hiragana = katakanaToHiragana(token.reading)
-                if (hiragana.endsWith('ッ'))
-                  hiragana = hiragana.slice(0, -1)
+              if (tokens?.length > 0) {
+                for (const token of tokens) {
+                  if (token?.reading) {
+                    let hiragana = katakanaToHiragana(token.reading)
+                    if (hiragana?.endsWith('ッ'))
+                      hiragana = hiragana.slice(0, -1)
 
-                const word = token.basic_form !== token.reading
-                  && token.basic_form !== hiragana && japaneseRegex.test(token.basic_form)
-                  ? `${token.basic_form}[${hiragana}]`
-                  : token.basic_form
-                furigana += word
+                    const word = token?.basic_form !== token?.reading
+                      && token?.basic_form !== hiragana && japaneseRegex?.test(token?.basic_form)
+                      ? `${token?.basic_form}[${hiragana}]`
+                      : token?.basic_form
+                    furigana += word || ''
+                  }
+                }
+                if (message?.data)
+                  message.data.transcript = furigana
               }
-              message.data.transcript = furigana
             }
           }
           catch (error) {
