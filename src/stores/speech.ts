@@ -121,14 +121,20 @@ export const useSpeechStore = defineStore('speech', {
       const { replace_words } = useWordReplaceStore()
 
       logStore.loading_result = true
-
+      
       // word replace
       log.transcript = replace_words(log.transcript)
       if (!log.transcript.trim()) { // If the processed input is only whitespace, do nothing. This may occur if the entire log transcript was replaced with whitespace.
         logStore.loading_result = false
-
+        
         return
       }
+      // Split the transcript into words and furigana
+      const wordsAndFurigana = log.transcript.split('|').map(part => {
+        const [word, furigana] = part.split(/[\[\]]/);
+        return { word, furigana: furigana || '' };
+      });
+      log.processedTranscript = wordsAndFurigana;
 
       // scroll to bottom
       const loglist = document.getElementById('loglist')

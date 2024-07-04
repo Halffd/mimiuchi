@@ -4,8 +4,18 @@
       <a
         v-for="log in logs"
         :class="{ 'fade-out': log.hide, 'final-text': log.isFinal || log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
+        :key="log.time"
       >
-        <a v-if="log.hide !== 2">{{ (translationStore.enabled && (log.translation || !translationStore.show_original)) ? log.translation : log.transcript }}&nbsp;&nbsp;</a>
+        <a v-if="log.hide !== 2">
+          <span v-for="(item, index) in log.processedTranscript" :key="index">
+            <ruby v-if="item.furigana">
+              {{ item.word }}
+              <rt>{{ item.furigana }}</rt>
+            </ruby>
+            <span v-else>{{ item.word }}</span>
+            &nbsp;
+          </span>
+        </a>
         <v-expand-transition v-show="log.pause">
           <div>
             <v-col class="pa-0" />
