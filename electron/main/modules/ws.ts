@@ -132,10 +132,26 @@ function initialize_ws(win: any, wss: any, port: number) {
                     if (hiragana?.endsWith('ッ'))
                       hiragana = hiragana.slice(0, -1)
 
-                    let word = token?.surface_form !== token?.reading
-                      && token?.surface_form !== hiragana && japaneseRegex?.test(token?.surface_form)
-                      ? `${token?.surface_form}[${hiragana}]`
-                      : token?.surface_form
+                    let word = ''
+                    if (token?.surface_form !== token?.reading
+                      && token?.surface_form !== hiragana && japaneseRegex?.test(token?.surface_form)) {
+                      if (token?.surface_form) {
+                        const surfaceForm = token.surface_form
+                        let newHiragana = hiragana.slice() // Create a copy of the hiragana array
+
+                        for (let i = 0; i < surfaceForm.length; i++) {
+                          const index = newHiragana.indexOf(surfaceForm[i])
+                          if (index === -1)
+                            newHiragana = newHiragana.slice(0, index).concat(newHiragana.slice(index + 1))
+                        }
+
+                        hiragana = newHiragana // Assign the modified array back to hiragana
+                        word = `${token?.surface_form}[${hiragana}]`
+                      }
+                    }
+                    else {
+                      word = token?.surface_form
+                    }
                     word += '|'
                     furigana += word || ''
                   }
