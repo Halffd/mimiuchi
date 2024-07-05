@@ -3,6 +3,7 @@ import { BrowserWindow, app, ipcMain, shell } from 'electron'
 
 import Store from 'electron-store'
 
+import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import { WebSocketServer } from 'ws'
 import { emit_osc, empty_queue } from './modules/osc'
 import { initialize_ws } from './modules/ws'
@@ -67,6 +68,13 @@ const window_config: any = {
 async function createWindow() {
   Object.assign(window_config, store.get('win_bounds'))
   win = new BrowserWindow(window_config)
+  installExtension(VUEJS3_DEVTOOLS)
+    .then((name) => {
+      console.log(`Added Extension: ${name}`)
+    })
+    .catch((err) => {
+      console.log('An error occurred: ', err)
+    })
 
   if (window_config.isMaximized)
     win.maximize()
@@ -80,7 +88,6 @@ async function createWindow() {
     // win.removeMenu()
     win.loadFile(indexHtml)
   }
-
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())

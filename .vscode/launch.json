@@ -22,9 +22,9 @@
   "configurations": [
     {
       "name": "Attach to Chrome",
-      "port": 5133,
-      "request": "attach",
+      "port": 9222,
       "url": "http://localhost:5173/",
+      "request": "attach",
       "type": "chrome",
       "webRoot": "${workspaceFolder}"
     },

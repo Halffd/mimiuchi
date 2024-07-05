@@ -3,7 +3,7 @@
     <SystemBar v-if="is_electron()"></SystemBar>
     <router-view name="Header"></router-view>    
     <v-main style="--v-layout-left: 0px; --v-layout-right: 0px; --v-layout-top: 0px; --v-layout-bottom: 60px; margin-bottom: -60px;">
-      <router-view :footer="footer" class="fullscreen-router-view"></router-view>
+      <router-view :footer="footer" :isElectron="is_electron()" class="fullscreen-router-view"></router-view>
     </v-main>
     <!-- Hide Footer Button -->
     <v-btn v-if="!footer" class="corner-button" color="primary" icon @click="toggleFooter">

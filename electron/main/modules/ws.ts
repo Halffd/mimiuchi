@@ -138,11 +138,10 @@ function initialize_ws(win: any, wss: any, port: number) {
                       : token?.surface_form
                     word += '|'
                     furigana += word || ''
-                    furigana = furigana.slice(0, -1)
                   }
                 }
                 if (message?.data)
-                  message.data.transcript = furigana
+                  message.data.transcript = furigana.slice(0, -1)
               }
             }
           }
