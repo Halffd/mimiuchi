@@ -174,12 +174,18 @@ function initialize_ws(win: any, wss: any, port: number) {
                               if (kanjis === len) {
                                 result += `${char}[${hiragana.substring(i)}]|`
                               }
+                            }
+                            else {
+                              const charLen = hiragana.length - chars
+                              if (kanjiLen === kanjis) {
+                                result += `${char}[${hiragana.substring(chars)}]|`
+                              }
+                              else if (kanjiLen === 2 && len >= 3 && kanjis === 1){
+                                const furiganaChar = newHiragana.shift() + newHiragana.shift() // Get the next character from newHiragana
+                                result += `${char}[${furiganaChar}]|`
+                                chars += 2
+                              }
                               else {
-                                const charLen = hiragana.length - chars
-                                if (kanjiLen === kanjis) {
-                                  result += `${char}[${hiragana.substring(chars)}]|`
-                                }
-                                else {
                                   const furiganaChar = newHiragana.shift() // Get the next character from newHiragana
                                   result += `${char}[${furiganaChar}]|`
                                   chars += 1
