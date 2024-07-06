@@ -529,7 +529,7 @@ export default {
         },
         handleHotkey(event: KeyboardEvent) {
             //    console.log(event, this);
-
+            if(event.ctrlKey || event.shiftKey || event.altKey) return
             // Check the event key to determine the triggered hotkey
             if (event.key === 'Enter') {
                 // Spacebar: mic button
@@ -544,7 +544,7 @@ export default {
             } else if (event.key === 'd') {
                 // Ctrl + D: Change language to id-ID
                 this.changeLanguage('id-ID');
-            } else if (event.key === 'f') {
+            } else if (event.key === 'f' ) {
                 // Ctrl + F: Change language to zh-CN
                 this.changeLanguage('zh-CN');
             } else if (event.key === ';') {
