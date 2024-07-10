@@ -1,7 +1,7 @@
 <template>
   <v-card id="log-list" v-resize="onResize" class="fill-height pa-4 overflow-auto log-list"
     :color="appearanceStore.ui.color" :height="height - 55" tile>
-    <div v-if="isElectron">
+    <div v-if="isElectron && logStore.jp">
       <a v-for="log in logs"
         :class="{ 'fade-out': log.hide, 'final-text': log.isFinal || log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
         :key="log.time">
@@ -97,6 +97,7 @@ export default {
       font_name,
       font_subtype,
       height,
+      logStore,
     }
   },
   data() {

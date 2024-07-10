@@ -9,7 +9,9 @@ kuromoji.builder({ dicPath: 'lib/dict' }).build((err, res) => {
 
   tokenizer = res
 })
+
 const japaneseRegex = /[\u4E00-\u9FFF]/
+
 function katakanaToHiragana(input: string): string {
   if (typeof input !== 'string' || !input.hasOwnProperty('length') || input.trim().length === 0)
     return input
@@ -104,10 +106,130 @@ function katakanaToHiragana(input: string): string {
     const char = input[i]
     if (katakanaToHiraganaMap[char])
       result += katakanaToHiraganaMap[char]
-    else
-      result += char
+    else result += char
   }
   return result
+}
+
+function processFurigana(message, tokenizer, japaneseRegex, katakanaToHiragana) {
+  let furigana = ''
+  if (message.data.transcript.length > 0) {
+    try {
+      if (japaneseRegex && japaneseRegex.test(message?.data?.transcript)) {
+        const tokens = tokenizer?.tokenize(message?.data?.transcript)
+        const words = message.data.transcript
+        const og = message.data.transcript
+
+        if (tokens?.length > 0) {
+          for (const token of tokens) {
+            let startIndex = og.indexOf(token.surface_form)
+            while (startIndex !== -1) startIndex = og.indexOf(token.surface_form, startIndex + 1)
+
+            furigana = words.slice(0, words.length - token.surface_form.length)
+            if (token?.reading) {
+              let hiragana = katakanaToHiragana(token.reading)
+              if (hiragana?.endsWith('ッ'))
+                hiragana = hiragana.slice(0, -1)
+
+              let word = ''
+
+              if (
+                token?.surface_form !== token?.reading
+                && token?.surface_form !== hiragana
+                && japaneseRegex?.test(token?.surface_form)
+              ) {
+                if (token?.surface_form) {
+                  const surfaceForm = token.surface_form
+                  let newHiragana = hiragana.split('') // Create a copy of the hiragana array
+                  const kanjiChars = surfaceForm.split('').filter(char => japaneseRegex.test(char))
+
+                  // Return the length of the filtered array
+                  const kanjiLen = kanjiChars.length
+
+                  for (let i = 0; i < surfaceForm.length; i++) {
+                    const index = newHiragana.indexOf(surfaceForm[i])
+                    if (index !== -1)
+                      newHiragana = newHiragana.slice(0, index).concat(newHiragana.slice(index + 1))
+                  }
+
+                  const fullHiragana = hiragana
+                  hiragana = newHiragana.join('') // Assign the modified array back to hiragana
+                  let result = ''
+                  const len = surfaceForm.length
+
+                  if (len === 1 || kanjiLen === len) {
+                    result = `${token.surface_form}[${hiragana}]`
+                  }
+                  else {
+                    let kanjis = 0
+                    let chars = 0
+                    for (let i = 0; i < surfaceForm.length; i++) {
+                      const char = surfaceForm[i]
+                      if (!japaneseRegex.test(char)) {
+                        // Check if the character is not Kanji
+                        result += `${char}|`
+                      }
+                      else {
+                        kanjis += 1
+                        if (kanjis === len) {
+                          result += `${char}[${hiragana.substring(chars)}]|`
+                        }
+                        else {
+                          const charLen = hiragana.length - chars
+                          if (kanjiLen === kanjis) {
+                            result += `${char}[${hiragana.substring(chars)}]|`
+                          }
+                          else if (kanjiLen === 2 && len >= 3 && kanjis === 1) {
+                            const furiganaChar = newHiragana.shift() + newHiragana.shift() // Get the next character from newHiragana
+                            result += `${char}[${furiganaChar}]|`
+                            chars += 2
+                          }
+                          else {
+                            const furiganaChar = newHiragana.shift() // Get the next character from newHiragana
+                            result += `${char}[${furiganaChar}]|`
+                            chars += 1
+                          }
+                        }
+                      }
+                    }
+                    result = result.slice(0, -1)
+                  }
+
+                  word = result
+                }
+              }
+              else {
+                word = token?.surface_form.split('').join('|') // Split non-kanji word into individual characters
+              }
+              word += '|'
+              furigana += word || ''
+            }
+          }
+
+          // Include any characters from the original string that were not covered by the tokens
+          let finalTranscript = ''
+          let tokenIndex = 0
+          for (let i = 0; i < og.length; i++) {
+            if (tokenIndex < tokens.length && i === og.indexOf(tokens[tokenIndex].surface_form, i)) {
+              finalTranscript += `${furigana.split('|').slice(0, tokens[tokenIndex].surface_form.length).join('|')}|`
+              i += tokens[tokenIndex].surface_form.length - 1
+              tokenIndex++
+            }
+            else {
+              finalTranscript += `${og[i]}|`
+            }
+          }
+
+          if (message?.data)
+            message.data.transcript = finalTranscript.slice(0, -1) // Remove the trailing '|'
+        }
+      }
+    }
+    catch (error) {
+      console.error('Error processing furigana:', error)
+    }
+  }
+  return furigana
 }
 
 /*
@@ -121,98 +243,9 @@ function initialize_ws(win: any, wss: any, port: number) {
       ws.on('message', (message) => {
         message = JSON.parse(message)
         if (message.data.transcript.length > 0) {
-          try {
-            if (japaneseRegex && japaneseRegex.test(message?.data?.transcript)) {
-              const tokens = tokenizer?.tokenize(message?.data?.transcript)
-              let furigana = ''
-              if (tokens?.length > 0) {
-                for (const token of tokens) {
-                  if (token?.reading) {
-                    let hiragana = katakanaToHiragana(token.reading)
-                    if (hiragana?.endsWith('ッ'))
-                      hiragana = hiragana.slice(0, -1)
-
-                    let word = ''
-
-                    if (
-                      token?.surface_form !== token?.reading
-                      && token?.surface_form !== hiragana
-                      && japaneseRegex?.test(token?.surface_form)
-                    ) {
-                      if (token?.surface_form) {
-                        const surfaceForm = token.surface_form
-                        let newHiragana = hiragana.split('') // Create a copy of the hiragana array
-                        const kanjiChars = surfaceForm.split('').filter(char => japaneseRegex.test(char))
-    
-                        // Return the length of the filtered array
-                        const kanjiLen = kanjiChars.length
-                        
-                        for (let i = 0; i < surfaceForm.length; i++) {
-                          const index = newHiragana.indexOf(surfaceForm[i])
-                          if (index !== -1)
-                            newHiragana = newHiragana.slice(0, index).concat(newHiragana.slice(index + 1))
-                        }
-
-                        const fullHiragana = hiragana
-                        hiragana = newHiragana.join('') // Assign the modified array back to hiragana
-                        let result = ''
-                        const len = surfaceForm.length
-
-                        if (len === 1 || kanjiLen === len) {
-                          result = `${token.surface_form}[${hiragana}]`
-                        }
-                        else {
-                          let kanjis = 0
-                          let chars = 0
-                          for (let i = 0; i < surfaceForm.length; i++) {
-                            const char = surfaceForm[i]
-                            if (!japaneseRegex.test(char)) { // Check if the character is not Kanji
-                              result += `${char}|`
-                            }
-                            else {
-                              kanjis += 1
-                              if (kanjis === len) {
-                                result += `${char}[${hiragana.substring(i)}]|`
-                              }
-                            }
-                            else {
-                              const charLen = hiragana.length - chars
-                              if (kanjiLen === kanjis) {
-                                result += `${char}[${hiragana.substring(chars)}]|`
-                              }
-                              else if (kanjiLen === 2 && len >= 3 && kanjis === 1){
-                                const furiganaChar = newHiragana.shift() + newHiragana.shift() // Get the next character from newHiragana
-                                result += `${char}[${furiganaChar}]|`
-                                chars += 2
-                              }
-                              else {
-                                  const furiganaChar = newHiragana.shift() // Get the next character from newHiragana
-                                  result += `${char}[${furiganaChar}]|`
-                                  chars += 1
-                                }
-                              }
-                            }
-                          }
-                          result = result.slice(0, -1)
-                        }
-
-                        word = result
-                      }
-                    }
-                    else {
-                      word = token?.surface_form.split('').join('|') // Split non-kanji word into individual characters
-                    }
-                    word += '|'
-                    furigana += word || ''
-                  }
-                }
-                if (message?.data)
-                  message.data.transcript = furigana.slice(0, -1) // Remove the trailing '|'
-              }
-            }
-          }
-          catch (error) {
-            console.error('Error processing furigana:', error)
+          if (message?.data) {
+            const furigana = processFurigana(message, tokenizer, japaneseRegex, katakanaToHiragana)
+            message.data.transcript = furigana.slice(0, -1) // Remove the trailing '|'
           }
         }
         console.log(`WS => ${message.type}`)

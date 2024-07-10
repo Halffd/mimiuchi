@@ -130,7 +130,8 @@ export const useSpeechStore = defineStore('speech', {
         return
       }
       // Split the transcript into words and furigana
-      if (is_electron()) {
+      logStore.jp = defaultStore.speech.recognition.lang === 'ja-JP'
+      if (is_electron() && logStore.jp) {
         const wordsAndFurigana = log.transcript.split('|').map((part) => {
           const [word, furigana] = part.split(/[\[\]]/)
           return { word, furigana: furigana || '' }

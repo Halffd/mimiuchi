@@ -16,6 +16,7 @@ export const useLogStore = defineStore('logs', {
   state: () => ({
     logs: [] as Log[],
     loading_result: false,
+    jp: false,
     wait_interval: undefined as undefined | ReturnType<typeof setTimeout>,
   }),
   getters: {
