@@ -109,8 +109,7 @@ export const useSpeechStore = defineStore('speech', {
       speech.speak(input)
     },
     async on_submit(log: any, index: number) {
-      if (!log.transcript.trim()) // If the submitted input is only whitespace, do nothing. This may occur if the user only submitted whitespace.
-        return
+      if (!log.transcript.trim()) return
 
       const logStore = useLogStore()
       const { text } = useAppearanceStore()
@@ -124,21 +123,14 @@ export const useSpeechStore = defineStore('speech', {
 
       // word replace
       log.transcript = replace_words(log.transcript)
-      if (!log.transcript.trim()) { // If the processed input is only whitespace, do nothing. This may occur if the entire log transcript was replaced with whitespace.
+      if (!log.transcript.trim()) {
         logStore.loading_result = false
-
         return
       }
-      // Split the transcript into words and furigana
+
+      // Set Japanese mode based on language
       logStore.jp = defaultStore.speech.recognition.lang === 'ja-JP'
-      if (is_electron() && logStore.jp) {
-        const wordsAndFurigana = log.transcript.split('|').map((part) => {
-          const [word, furigana] = part.split(/[\[\]]/)
-          return { word, furigana: furigana || '' }
-        })
-        log.processedTranscript = wordsAndFurigana
-      }
-      console.log(logStore.jp, log.processedTranscript, log.transcript)
+
       // scroll to bottom
       const loglist = document.getElementById('loglist')
       if (loglist)
@@ -150,9 +142,7 @@ export const useSpeechStore = defineStore('speech', {
       let i = logStore.logs.length - 1 // track current index
       if (i >= 0 && !logStore.logs[i].isFinal || log.translation) {
         logStore.logs[index] = log
-        // push to log
-      }
-      else {
+      } else {
         logStore.logs.push(log)
         i++
       }
