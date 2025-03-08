@@ -138,6 +138,7 @@ export const useSpeechStore = defineStore('speech', {
         })
         log.processedTranscript = wordsAndFurigana
       }
+      console.log(logStore.jp, log.processedTranscript, log.transcript)
       // scroll to bottom
       const loglist = document.getElementById('loglist')
       if (loglist)

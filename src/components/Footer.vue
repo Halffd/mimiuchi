@@ -277,7 +277,7 @@ export default {
                 this.defaultStore.toggle_broadcast();
             }
 
-            if (this.isAuto) {
+            /*if (this.isAuto) {
                 if (this.defaultStore.broadcasting) {
                     if (this.bInterval) {
                         clearInterval(this.bInterval);
@@ -290,7 +290,7 @@ export default {
                         }, 1000);
                     }
                 }
-            }
+            }*/
         },
         showToast(text: string, color: string) {
             this.toast.text = text;
@@ -468,9 +468,13 @@ export default {
             // Implement the functionality to toggle translate here
         },
 
-        hideTranslate() {
-            // Hide translate
-            // Implement the functionality to hide translate here
+        hideFurigana() {
+            // Hide furigana
+            // Implement the functionality to hide furigana here
+            const furi = document.querySelectorAll('rt')
+            for(let i of furi){
+                i.parentNoe.removeChild(i)
+            }
         },
 
         toggleLogging() {
@@ -596,7 +600,7 @@ export default {
                 this.toggleTranslate();
             } else if (event.key === 'y') {
                 // Ctrl + Y: Hide translate
-                this.hideTranslate();
+                this.hideFurigana();
             } else if (event.key === 'u') {
                 // Ctrl + U: Logging
                 this.toggleLogging();
@@ -613,6 +617,8 @@ export default {
                 // Ctrl + 0-9: Select part of text in the screen
                 const percentage = parseInt(event.key) * 10;
                 this.selectText(percentage);
+            } else if (event.key === 'b') {
+                this.toggleBroadcast();
             }
         },
 

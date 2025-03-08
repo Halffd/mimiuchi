@@ -64,6 +64,7 @@ const window_config: any = {
     contextIsolation: true, // was false
   },
 }
+app.disableHardwareAcceleration()
 
 async function createWindow() {
   Object.assign(window_config, store.get('win_bounds'))

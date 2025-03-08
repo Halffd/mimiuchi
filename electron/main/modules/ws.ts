@@ -120,7 +120,9 @@ function initialize_ws(win: any, wss: any) {
     wss.on('connection', (ws) => {
       ws.on('message', (message) => {
         message = JSON.parse(message)
-        if (message.data.transcript.length > 0) {
+        if (message?.data?.transcript
+          && typeof message?.data?.transcript === 'string'
+          && message?.data?.transcript?.length > 0) {
           try {
             if (japaneseRegex && japaneseRegex.test(message?.data?.transcript)) {
               const tokens = tokenizer?.tokenize(message?.data?.transcript)
@@ -176,6 +178,10 @@ function initialize_ws(win: any, wss: any) {
                               else {
                                 if (kanjiLen === kanjis) {
                                   result += `${char}[${hiragana.substring(chars)}]|`
+                                } 
+                                else if(kanjiLen === hiragana.length && kanjis === 1){
+                                  result += `${char}[${furiganaChar}]|`
+                                  chars += 1
                                 }
                                 else if (kanjiLen === 2 && len >= 3 && kanjis === 1) {
                                   const furiganaChar = newHiragana.shift() + newHiragana.shift() // Get the next character from newHiragana

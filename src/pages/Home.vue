@@ -11,6 +11,7 @@
               {{ item.word }}
               <rt>{{ item.furigana }}</rt>
             </ruby>
+            <span v-else-if="!isJapaneseWord(item.word)">{{ item.word }}&nbsp;&nbsp;</span>
             <span v-else>{{ item.word }}</span>
           </span>
         </a>
@@ -108,6 +109,8 @@ export default {
 
       ws: null as any,
 
+      japaneseRegex: /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/,
+
       listening: false,
       listening_error: false,
       talking: false,
@@ -145,6 +148,9 @@ export default {
   methods: {
     onResize() {
       this.windowSize = { x: window.innerWidth, y: window.innerHeight }
+    },
+    isJapaneseWord(word) {
+      return this.japaneseRegex.test(word);
     },
   },
 }
@@ -250,5 +256,12 @@ html {
   100% {
     opacity: 0;
   }
+}
+rt, ruby > rt {
+      pointer-events: none;
+      user-select: none;
+}
+rb, ruby {
+  user-select: text;
 }
 </style>
