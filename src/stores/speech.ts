@@ -220,7 +220,10 @@ export const useSpeechStore = defineStore('speech', {
         }
       }
       else if (defaultStore.ws) {
-        defaultStore.ws.send(`{"type": "text", "data": ${JSON.stringify(log)}}`)
+        defaultStore.ws.send(`{"type": "text", "data": ${JSON.stringify({
+          ...log,
+          language: defaultStore.speech.recognition.lang
+        })}}`)
       }
     },
     pin_language(selected_language: list_item) {

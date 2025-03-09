@@ -7,10 +7,14 @@
         :key="log.time">
         <a v-if="log.hide !== 2">
           <span v-for="(item, index) in parseTranscript(log.transcript)" :key="index" class="japanese-text">
-            <ruby v-if="item.furigana" class="japanese-ruby">
-              {{ item.word }}<rt>{{ item.furigana }}</rt>
-            </ruby>
-            <span v-else>{{ item.word }}</span>
+            <template v-if="item.furigana">
+              <ruby class="japanese-ruby">
+                {{ item.word }}<rt>{{ item.furigana }}</rt>
+              </ruby>
+            </template>
+            <template v-else>
+              <span>{{ item.word }}</span>
+            </template>
           </span>
         </a>
         <v-expand-transition v-show="log.pause">
@@ -25,7 +29,7 @@
         :class="{ 'fade-out': log.hide, 'final-text': log.isFinal || log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
         :key="log.time">
         <a v-if="log.hide !== 2">{{ (translationStore.enabled && (log.translation || !translationStore.show_original)) ?
-          log.translation : log.transcript }}&nbsp;&nbsp;</a>
+          log.translation : log.transcript }}</a>
         <v-expand-transition v-show="log.pause">
           <div>
             <v-col class="pa-0" />
@@ -148,26 +152,41 @@ export default {
       this.windowSize = { x: window.innerWidth, y: window.innerHeight }
     },
     parseTranscript(transcript: string) {
-      if (!transcript) return [];
+      console.log('Parsing transcript:', transcript);
+      if (!transcript) {
+        console.log('Empty transcript');
+        return [];
+      }
       
       // Split by pipe character
       const parts = transcript.split('|');
+      console.log('Split parts:', parts);
+      
       const result = [];
       
       for (const part of parts) {
-        if (!part) continue;
+        if (!part) {
+          console.log('Skipping empty part');
+          continue;
+        }
         
+        console.log('Processing part:', part);
         // Check if part contains furigana (has square brackets)
         const match = part.match(/^(.*?)\[(.*?)\]$/);
         if (match) {
           const [_, word, furigana] = match;
-          // Always create the furigana object if we have brackets
+          console.log(`Found furigana: word=${word}, furigana=${furigana}`);
           result.push({ word, furigana });
         } else {
-          result.push({ word: part, furigana: '' });
+          console.log(`No furigana, adding as plain word: ${part}`);
+          // Only add word without furigana if we're not in Japanese mode or if it's punctuation/spacing
+          if (!this.logStore.jp || /[^\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(part)) {
+            result.push({ word: part, furigana: '' });
+          }
         }
       }
       
+      console.log('Final parsed result:', result);
       return result;
     },
     isJapaneseWord(word: string) {

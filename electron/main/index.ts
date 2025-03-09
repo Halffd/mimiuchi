@@ -11,6 +11,15 @@ import { check_update } from './modules/check_update'
 
 const store = new Store()
 
+// Check if -d argument is present for auto-opening DevTools
+const shouldOpenDevTools = process.argv.includes('-d')
+
+// Enable DevTools in development mode or if -d flag is present
+if (process.env.VITE_DEV_SERVER_URL || shouldOpenDevTools) {
+  app.commandLine.appendSwitch('remote-debugging-port', '8315')
+  app.commandLine.appendSwitch('ignore-certificate-errors')
+}
+
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -56,7 +65,7 @@ const window_config: any = {
   titleBarStyle: 'hidden',
   webPreferences: {
     preload,
-    devTools: false,
+    devTools: true,
     // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
     // Consider using contextBridge.exposeInMainWorld
     // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
@@ -69,26 +78,32 @@ app.disableHardwareAcceleration()
 async function createWindow() {
   Object.assign(window_config, store.get('win_bounds'))
   win = new BrowserWindow(window_config)
-  installExtension(VUEJS3_DEVTOOLS)
-    .then((name) => {
-      console.log(`Added Extension: ${name}`)
-    })
-    .catch((err) => {
-      console.log('An error occurred: ', err)
-    })
+  
+  // Install Vue DevTools
+  try {
+    await installExtension(VUEJS3_DEVTOOLS)
+    console.log('Added Vue DevTools')
+  } catch (err) {
+    console.log('Failed to add Vue DevTools: ', err)
+  }
 
   if (window_config.isMaximized)
     win.maximize()
 
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(url)
-    // Open devTool if the app is not packaged
-    // win.webContents.openDevTools()
-  }
-  else {
-    // win.removeMenu()
+  } else {
     win.loadFile(indexHtml)
   }
+
+  // Force open DevTools if -d argument is present
+  if (shouldOpenDevTools) {
+    // Small delay to ensure window is ready
+    setTimeout(() => {
+      win.webContents.openDevTools({ mode: 'detach' })
+    }, 500)
+  }
+
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())

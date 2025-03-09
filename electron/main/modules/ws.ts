@@ -124,33 +124,44 @@ function initialize_ws(win: any, wss: any) {
           && typeof message?.data?.transcript === 'string'
           && message?.data?.transcript?.length > 0) {
           try {
-            const tokens = tokenizer?.tokenize(message?.data?.transcript)
-            let furigana = ''
-            if (tokens?.length > 0) {
-              for (const token of tokens) {
-                if (token?.reading && token?.surface_form) {
-                  let hiragana = katakanaToHiragana(token.reading)
-                  if (hiragana?.endsWith('ッ')) {
-                    hiragana = hiragana.slice(0, -1)
-                  }
+            console.log('Received text:', message.data.transcript)
+            console.log('Language:', message.data?.language)
+            
+            // Only process Japanese text
+            if (message?.data?.language === 'ja-JP') {
+              const tokens = tokenizer?.tokenize(message?.data?.transcript)
+              console.log('Tokenized:', tokens)
+              
+              let furigana = ''
+              if (tokens?.length > 0) {
+                for (const token of tokens) {
+                  if (token?.reading && token?.surface_form) {
+                    let hiragana = katakanaToHiragana(token.reading)
+                    if (hiragana?.endsWith('ッ')) {
+                      hiragana = hiragana.slice(0, -1)
+                    }
+                    console.log(`Token: ${token.surface_form}, Reading: ${hiragana}`)
 
-                  // If reading is different from surface form, add furigana
-                  if (token.surface_form !== hiragana) {
-                    furigana += `${token.surface_form}[${hiragana}]|`
-                  } else {
-                    // For words without reading difference, just add the word
+                    // If reading is different from surface form, add furigana
+                    if (token.surface_form !== hiragana) {
+                      furigana += `${token.surface_form}[${hiragana}]|`
+                    } else {
+                      // For words without reading difference, just add the word
+                      furigana += `${token.surface_form}|`
+                    }
+                  } else if (token?.surface_form) {
                     furigana += `${token.surface_form}|`
                   }
-                } else if (token?.surface_form) {
-                  // For tokens without reading, just add the surface form
-                  furigana += `${token.surface_form}|`
+                }
+
+                if (furigana) {
+                  // Remove trailing pipe and set the transcript
+                  message.data.transcript = furigana.slice(0, -1)
+                  console.log('Processed text with furigana:', message.data.transcript)
                 }
               }
-
-              if (furigana) {
-                // Remove trailing pipe and set the transcript
-                message.data.transcript = furigana.slice(0, -1)
-              }
+            } else {
+              console.log('Non-Japanese text, passing through without processing')
             }
           } catch (error) {
             console.error('Error processing furigana:', error)
