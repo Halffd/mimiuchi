@@ -9,13 +9,43 @@
             :label="$t('settings.stt.type')"
             :items="stt_options"
             item-title="title"
+            return-object
+            variant="outlined"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row v-if="speechStore.stt.type.value === 'whisper'">
+        <v-col :cols="12">
+          <v-select
+            v-model="speechStore.stt.whisper_model"
+            label="Whisper Model"
+            :items="speechStore.whisper_models"
+            item-title="title"
             item-value="value"
             variant="outlined"
           />
         </v-col>
       </v-row>
 
-      <v-row v-if="speechStore.stt.type.value === 'webspeech' && !is_electron()">
+      <v-row v-if="speechStore.stt.type.value === 'api'">
+        <v-col :cols="12">
+          <v-text-field
+            v-model="speechStore.stt.api_url"
+            label="API URL"
+            placeholder="https://api.openai.com/v1/audio/transcriptions"
+            variant="outlined"
+          />
+          <v-text-field
+            v-model="speechStore.stt.api_key"
+            label="API Key"
+            type="password"
+            variant="outlined"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row v-if="speechStore.stt.type.value === 'whisper' || speechStore.stt.type.value === 'api' || (speechStore.stt.type.value === 'webspeech' && !is_electron())">
         <v-col :cols="12">
           <v-slider
             v-model="speechStore.stt.sensitivity"
@@ -146,6 +176,14 @@ export default {
         title: 'Web Speech API',
         value: 'webspeech',
       },
+      {
+        title: 'Whisper (Local)',
+        value: 'whisper',
+      },
+      {
+        title: 'STT API (OpenAI compatible)',
+        value: 'api',
+      },
     ],
     language_choice: '',
     search_lang: '',
@@ -162,6 +200,12 @@ export default {
     },
   },
   watch: {
+    'speechStore.stt.type': {
+      handler() {
+        this.speechStore.initialize_speech(this.speechStore.stt.language)
+      },
+      deep: true,
+    },
     language_choice(new_val) {
       if (new_val.value)
         this.speechStore.stt.language = new_val.value

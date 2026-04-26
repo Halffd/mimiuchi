@@ -18,6 +18,10 @@ export const useTranslationStore = defineStore('translation', {
   actions: {
     onMessageReceived(e: any) {
       const logStore = useLogStore()
+      
+      // Ignore transcription tasks in the translation store
+      if (e.data.task === 'transcribe') return
+
       switch (e.data.status) {
         case 'progress':
           if (e.data.file === 'onnx/encoder_model_quantized.onnx')

@@ -21,18 +21,32 @@
         <div class="d-flex w-100 align-center">
             <v-form class="d-flex w-100 align-center" @submit.prevent="onSubmit()">
                 <div class="d-flex w-100 align-center">
+                    <!-- STT Type Selector -->
+                    <v-select v-model="speechStore.stt.type" :items="[
+                        { title: 'Web Speech', value: 'webspeech' },
+                        { title: 'Whisper (Local)', value: 'whisper' },
+                        { title: 'STT API', value: 'api' }
+                    ]" item-title="title" return-object label="STT Type" density="compact" variant="outlined" hide-details class="mr-2" style="max-width: 140px;"></v-select>
+
                     <!-- Language Selector -->
                     <v-select v-model="selectedLanguage" :items="WebSpeechLangs" item-value="value" item-text="title"
-                        label="Language" dense outlined hide-details></v-select>
+                        label="Language" density="compact" variant="outlined" hide-details style="max-width: 180px;"></v-select>
+                    
+                    <!-- Whisper Model Selector -->
+                    <v-select v-if="speechStore.stt.type.value === 'whisper'" 
+                        v-model="speechStore.stt.whisper_model" :items="speechStore.whisper_models" 
+                        item-title="title" item-value="value"
+                        label="Whisper Model" density="compact" variant="outlined" hide-details class="ml-2" style="max-width: 180px;"></v-select>
+
                     <v-text-field v-model="input_text" density="compact" variant="outlined"
                         :label="$t('general.type_message')" append-inner-icon="mdi-chevron-right" class="mr-6"
                         single-line hide-details flat loading>
                         <template #loader>
                             <v-progress-linear
-                                :active="logStore.loading_result === true || translationStore.download >= 0"
-                                :color="translationStore.download !== -1 ? 'warning' : 'secondary'"
-                                :indeterminate="translationStore.download === -1"
-                                :model-value="translationStore.download" :max="100" height="5"
+                                :active="logStore.loading_result === true || translationStore.download >= 0 || speechStore.download >= 0"
+                                :color="translationStore.download !== -1 || speechStore.download !== -1 ? 'warning' : 'secondary'"
+                                :indeterminate="translationStore.download === -1 && speechStore.download === -1"
+                                :model-value="Math.max(translationStore.download, speechStore.download)" :max="100" height="5"
                                 rounded></v-progress-linear>
                         </template>
                     </v-text-field>
@@ -40,7 +54,7 @@
                     <v-spacer v-if="!smAndDown"></v-spacer>
 
                     <div class="d-flex jusqtify-right">
-                        <v-btn v-if="!is_electron()" class="mr-4"
+                        <v-btn v-if="!is_electron() || speechStore.stt.type.value === 'whisper' || speechStore.stt.type.value === 'api'" class="mr-4"
                             :color="(defaultStore.speech.listening) ? 'success' : 'error'" size="small" icon
                             variant="outlined" @click="toggleListen">
                             <v-icon v-if="!defaultStore.speech.listening">mdi-microphone-off</v-icon>
@@ -188,7 +202,7 @@ export default {
         },
 
         selectedLanguage(newLanguage) {
-            // Implement functionality for changing the language and showing the popup message
+            this.changeLanguage(newLanguage)
         },
         'speechStore.stt.language'(new_val) {
             if (this.defaultStore.speech.recognition) {
@@ -205,6 +219,7 @@ export default {
             window.ipcRenderer.removeListener('receive-text-event')
         }
         this.defaultStore.worker.removeEventListener('message', this.translationStore.onMessageReceived)
+        this.defaultStore.worker.removeEventListener('message', this.speechStore.onMessageReceived)
     },
     updated() {
         this.reloadEvents()
@@ -220,6 +235,7 @@ export default {
             })
         }
         this.defaultStore.worker.addEventListener('message', this.translationStore.onMessageReceived)
+        this.defaultStore.worker.addEventListener('message', this.speechStore.onMessageReceived)
         // Add a double-click event listener to a specific corner of the app to toggle the visibility of the footer section
         const cornerElement = document.getElementById('corner-element');
         cornerElement?.addEventListener('dblclick', (ev: MouseEvent) => {

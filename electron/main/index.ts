@@ -56,7 +56,7 @@ const window_config: any = {
   titleBarStyle: 'hidden',
   webPreferences: {
     preload,
-    devTools: false,
+    devTools: true,
     // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
     // Consider using contextBridge.exposeInMainWorld
     // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation

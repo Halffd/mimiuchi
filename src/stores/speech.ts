@@ -9,7 +9,7 @@ import { useWordReplaceStore } from '@/stores/word_replace'
 import webhook from '@/helpers/webhook'
 import is_electron from '@/helpers/is_electron'
 import { i18n } from '@/plugins/i18n'
-import { WebSpeech } from '@/modules/speech'
+import { WebSpeech, Whisper } from '@/modules/speech'
 
 interface pinned_languages {
   [key: string]: list_item
@@ -27,7 +27,23 @@ export const useSpeechStore = defineStore('speech', {
       language: 'en-US',
       confidence: 0.9,
       sensitivity: 0.0,
+      whisper_model: 'Xenova/whisper-tiny',
+      api_url: '',
+      api_key: '',
     },
+    whisper_models: [
+      { title: 'Tiny (Multilingual)', value: 'Xenova/whisper-tiny' },
+      { title: 'Tiny (English only)', value: 'Xenova/whisper-tiny.en' },
+      { title: 'Base (Multilingual)', value: 'Xenova/whisper-base' },
+      { title: 'Base (English only)', value: 'Xenova/whisper-base.en' },
+      { title: 'Small (Multilingual)', value: 'Xenova/whisper-small' },
+      { title: 'Small (English only)', value: 'Xenova/whisper-small.en' },
+      { title: 'Medium (Multilingual)', value: 'Xenova/whisper-medium' },
+      { title: 'Medium (English only)', value: 'Xenova/whisper-medium.en' },
+      { title: 'Large-v1', value: 'Xenova/whisper-large-v1' },
+      { title: 'Large-v2', value: 'Xenova/whisper-large-v2' },
+      { title: 'Large-v3', value: 'Xenova/whisper-large-v3' },
+    ],
     tts: {
       enabled: false,
       type: {
@@ -39,14 +55,32 @@ export const useSpeechStore = defineStore('speech', {
       pitch: 1,
     },
     pinned_languages: {} as pinned_languages,
+    download: -1, // percent downloaded 0-100. -1 = done
   }),
   getters: {
 
   },
   actions: {
+    onMessageReceived(e: any) {
+      if (e.data.task !== 'transcribe') return
+
+      switch (e.data.status) {
+        case 'progress':
+          this.download = e.data.progress
+          break
+        case 'ready':
+          this.download = -1
+          break
+      }
+    },
     initialize_speech(language: string) {
       const defaultStore = useDefaultStore()
-      defaultStore.speech = new WebSpeech(language)
+      if (this.stt.type.value === 'whisper')
+        defaultStore.speech = new Whisper(language)
+      else if (this.stt.type.value === 'api')
+        defaultStore.speech = new Whisper(language) // Reuse Whisper for now or add API class
+      else
+        defaultStore.speech = new WebSpeech(language)
     },
     toggle_listen() {
       const defaultStore = useDefaultStore()
@@ -84,8 +118,11 @@ export const useSpeechStore = defineStore('speech', {
             return // web-speech: no sound detected
           if (event.error === 'not-allowed')
             desc = i18n.t('alerts.mic_error')
-          if (event.error === 'aborted')
+          else if (event.error === 'aborted')
             desc = i18n.t('alerts.device_in_use')
+          else
+            desc = event.error || event.message || i18n.t('alerts.speech_error') || 'Speech recognition error'
+
           defaultStore.speech.listening = false
           defaultStore.speech.listening_error = true
           defaultStore.show_snackbar('error', desc)
