@@ -122,8 +122,12 @@ function initialize_ws(win: any, wss: any, port: number) {
         message = JSON.parse(message)
         if (message.data.transcript.length > 0) {
           try {
-            if (japaneseRegex && japaneseRegex.test(message?.data?.transcript)) {
-              const tokens = tokenizer?.tokenize(message?.data?.transcript)
+            // Only apply Japanese logic if explicitly requested or if it looks like Japanese 
+            // and NOT explicitly another language like Chinese
+            const isJapanese = message.data.language?.startsWith('ja') || (!message.data.language && japaneseRegex.test(message?.data?.transcript))
+            
+            if (isJapanese && tokenizer) {
+              const tokens = tokenizer.tokenize(message?.data?.transcript)
               let furigana = ''
               if (tokens?.length > 0) {
                 for (const token of tokens) {

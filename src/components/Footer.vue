@@ -120,6 +120,7 @@ import { useDefaultStore } from '../stores/default'
 import { computed, onMounted, onUnmounted } from 'vue';
 
 import { WebSpeechLangs } from '../modules/speech/WebSpeech';
+import { rubyProxy } from '@/helpers/ruby_proxy'
 
 declare const window: any
 declare type HistoryStateValue = any
@@ -349,7 +350,7 @@ export default {
                 }
             }
         },
-        onSubmit(log: Log | null = null) {
+        async onSubmit(log: Log | null = null) {
             if (log && !log.transcript) return
 
             if (!log)
@@ -360,6 +361,12 @@ export default {
                     translate: false,
                     hide: 0 // 1 = fade, 2 = hide
                 }
+            
+            // Apply ruby logic for manual input
+            if (log.isFinal && !log.processedTranscript) {
+                log.transcript = await rubyProxy.generate(log.transcript, this.speechStore.stt.language)
+            }
+
             if (log.isFinal) this.paramTrigger(log.transcript)
             this.speechStore.on_submit(log, Math.max(this.logStore.logs.length - 1, 0))
 
@@ -386,6 +393,7 @@ export default {
             // Call the auto function to change the language and toggle the listen mode
             //debugger;
             const result = this.auto(this.speechStore, language, true);
+            this.selectedLanguage = language
             let speech = JSON.parse(localStorage.getItem('speech'));
             speech.stt.language = language
             localStorage.setItem('speech', JSON.stringify(speech));

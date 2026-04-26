@@ -1,32 +1,18 @@
 <template>
   <v-card id="log-list" v-resize="onResize" class="fill-height pa-4 overflow-auto log-list"
     :color="appearanceStore.ui.color" :height="height - 55" tile>
-    <div v-if="isElectron">
+    <div>
       <a v-for="log in logs"
         :class="{ 'fade-out': log.hide, 'final-text': log.isFinal || log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
         :key="log.time">
         <a v-if="log.hide !== 2">
-          <span v-for="(item, index) in log.processedTranscript" :key="index">
-            <ruby v-if="item.furigana">
-              {{ item.word }}
-              <rt>{{ item.furigana }}</rt>
-            </ruby>
-            <span v-else>{{ item.word }}</span>
+          <span v-if="log.processedTranscript && log.processedTranscript.length > 0"><span v-for="(item, index) in log.processedTranscript" :key="index"><ruby v-if="item.furigana">{{ item.word }}<rt>{{ item.furigana }}</rt></ruby><span v-else>{{ item.word }}</span></span></span>
+          <span v-else>
+            {{ (translationStore.enabled && (log.translation || !translationStore.show_original)) ?
+              log.translation : log.transcript }}
           </span>
+          &nbsp;&nbsp;
         </a>
-        <v-expand-transition v-show="log.pause">
-          <div>
-            <v-col class="pa-0" />
-          </div>
-        </v-expand-transition>
-      </a>
-    </div>
-    <div v-else>
-      <a v-for="log in logs"
-        :class="{ 'fade-out': log.hide, 'final-text': log.isFinal || log.isTranslationFinal, 'interim-text': !log.isFinal || (!log.isTranslationFinal && log.translate) }"
-        :key="log.time">
-        <a v-if="log.hide !== 2">{{ (translationStore.enabled && (log.translation || !translationStore.show_original)) ?
-          log.translation : log.transcript }}&nbsp;&nbsp;</a>
         <v-expand-transition v-show="log.pause">
           <div>
             <v-col class="pa-0" />
@@ -250,4 +236,17 @@ html {
     opacity: 0;
   }
 }
+
+ruby {
+  ruby-align: center;
+  ruby-position: over;
+}
+
+rt {
+  font-size: 0.5em;
+  padding: 0 !important;
+  margin: 0 !important;
+  user-select: none;
+}
 </style>
+
