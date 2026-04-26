@@ -10,6 +10,7 @@ import webhook from '@/helpers/webhook'
 import is_electron from '@/helpers/is_electron'
 import { i18n } from '@/plugins/i18n'
 import { WebSpeech, Whisper } from '@/modules/speech'
+import { rubyProxy } from '@/helpers/ruby_proxy'
 
 interface pinned_languages {
   [key: string]: list_item
@@ -96,10 +97,14 @@ export const useSpeechStore = defineStore('speech', {
       defaultStore.speech.listening = !defaultStore.speech.listening
       if (defaultStore.speech.listening) {
         defaultStore.speech.start()
-        defaultStore.speech.onresult = (transcript: string, isFinal: boolean) => {
+        defaultStore.speech.onresult = async (transcript: string, isFinal: boolean) => {
+          let processedTranscript = transcript
+          if (isFinal)
+            processedTranscript = await rubyProxy.generate(transcript, this.stt.language)
+
           const { logs } = useLogStore()
           const log = {
-            transcript,
+            transcript: processedTranscript,
             isFinal,
             isTranslationFinal: false,
             translate: false,
@@ -167,13 +172,11 @@ export const useSpeechStore = defineStore('speech', {
         return
       }
       // Split the transcript into words and furigana
-      if (is_electron()) {
-        const wordsAndFurigana = log.transcript.split('|').map((part) => {
-          const [word, furigana] = part.split(/[\[\]]/)
-          return { word, furigana: furigana || '' }
-        })
-        log.processedTranscript = wordsAndFurigana
-      }
+      const wordsAndFurigana = log.transcript.split('|').map((part: string) => {
+        const [word, furigana] = part.split(/[\[\]]/)
+        return { word, furigana: furigana || '' }
+      })
+      log.processedTranscript = wordsAndFurigana
       // scroll to bottom
       const loglist = document.getElementById('loglist')
       if (loglist)
