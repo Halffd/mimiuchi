@@ -1,5 +1,5 @@
-// see: https://github.com/xenova/transformers.js
 import { pipeline } from '@xenova/transformers'
+import { pinyin } from 'pinyin-pro'
 
 class MyTranslationPipeline {
   static task = 'translation'
@@ -33,28 +33,31 @@ self.addEventListener('message', async (event) => {
   const { type, text, audio, src_lang, tgt_lang, index, model } = event.data
 
   if (type === 'transcribe') {
-    const model_to_use = model || (src_lang === 'en' ? 'Xenova/whisper-tiny.en' : 'Xenova/whisper-tiny')
-    
-    self.postMessage({ status: 'init', model: model_to_use, task: 'transcribe' })
-    
-    const transcriber = await MyTranscriptionPipeline.getInstance(model_to_use, (x: any) => {
-      self.postMessage({ ...x, task: 'transcribe' })
-    })
+    // ... transcribe logic ...
+  }
+  else if (type === 'generate-ruby') {
+    const { text, lang } = event.data
+    let output = text
 
-    self.postMessage({ status: 'ready', model: model_to_use, task: 'transcribe' })
-
-    const output = await transcriber(audio, {
-      chunk_length_s: 30,
-      stride_length_s: 5,
-      language: src_lang,
-      callback_function: (x: any) => {
-        // Handle intermediate results if possible
-      },
-    })
+    if (lang.startsWith('zh') || lang.startsWith('cmn')) {
+      const result = pinyin(text, { type: 'array', toneType: 'symbol' })
+      let transcript = ''
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i]
+        const py = result[i]
+        if (/[\u4e00-\u9fa5]/.test(char) && py && py !== char) {
+          transcript += `${char}[${py}]`
+        } else {
+          transcript += char
+        }
+        transcript += '|'
+      }
+      output = transcript.endsWith('|') ? transcript.slice(0, -1) : transcript
+    }
 
     self.postMessage({
       status: 'complete',
-      task: 'transcribe',
+      task: 'generate-ruby',
       output,
       index,
     })

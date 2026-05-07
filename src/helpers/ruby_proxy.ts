@@ -1,6 +1,5 @@
 
-import { pinyin } from 'pinyin-pro'
-import is_electron from '@/helpers/is_electron'
+import { useDefaultStore } from '@/stores/default'
 
 export interface RubyProvider {
   supports(lang: string): boolean
@@ -26,25 +25,31 @@ class ChineseProvider implements RubyProvider {
   }
 
   async generate(text: string): Promise<string> {
-    // Using pinyin-pro to get pinyin for each character
-    // We use array type to match characters 1:1 if possible
-    const result = pinyin(text, { type: 'array', toneType: 'symbol' })
-    let transcript = ''
-    
-    // pinyin-pro array type usually matches character indices
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i]
-      const py = result[i]
-      
-      // Only add ruby if it's a Chinese character and pinyin is different
-      if (/[\u4e00-\u9fa5]/.test(char) && py && py !== char) {
-        transcript += `${char}[${py}]`
-      } else {
-        transcript += char
+    const defaultStore = useDefaultStore()
+    const worker = defaultStore.worker
+
+    if (!worker) return text
+
+    return new Promise((resolve) => {
+      const messageHandler = (e: MessageEvent) => {
+        if (e.data.status === 'complete' && e.data.task === 'generate-ruby') {
+          worker.removeEventListener('message', messageHandler)
+          resolve(e.data.output)
+        }
       }
-      transcript += '|'
-    }
-    return transcript.endsWith('|') ? transcript.slice(0, -1) : transcript
+      worker.addEventListener('message', messageHandler)
+      worker.postMessage({
+        type: 'generate-ruby',
+        text,
+        lang: 'zh', // Provider already filtered for zh
+      })
+      
+      // Safety timeout
+      setTimeout(() => {
+        worker.removeEventListener('message', messageHandler)
+        resolve(text)
+      }, 1000)
+    })
   }
 }
 
