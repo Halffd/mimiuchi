@@ -211,3 +211,29 @@ ipcMain.on('update-check', async (event) => {
   const latest = await check_update()
   win.webContents.send('update-check', latest)
 })
+
+// History Management
+ipcMain.handle('history-save', (event, session) => {
+  const history: any[] = store.get('history') || []
+  const index = history.findIndex((s: any) => s.id === session.id)
+  if (index !== -1) {
+    history[index] = session
+  } else {
+    history.unshift(session)
+  }
+  store.set('history', history.slice(0, 200)) // Keep last 200
+})
+
+ipcMain.handle('history-get-all', () => {
+  return store.get('history') || []
+})
+
+ipcMain.handle('history-delete', (event, id) => {
+  const history: any[] = store.get('history') || []
+  const filtered = history.filter((s: any) => s.id !== id)
+  store.set('history', filtered)
+})
+
+ipcMain.handle('history-clear', () => {
+  store.set('history', [])
+})

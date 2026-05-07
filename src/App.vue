@@ -10,7 +10,8 @@
     <v-icon>{{ footer ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
   </v-btn>
 
-    <router-view name="Footer" @toggle-footer-visibility="toggleFooter" ></router-view>
+    <router-view name="Footer" @toggle-footer-visibility="toggleFooter" @show-history="showHistory"></router-view>
+    <HistoryOverlay ref="historyOverlay" />
   </v-app>
 </template>
 
@@ -26,13 +27,15 @@ import { useOSCStore } from  './stores/osc'
 import is_electron from './helpers/is_electron'
 
 import SystemBar from './components/appbars/SystemBar.vue'
+import HistoryOverlay from '@/components/overlays/HistoryOverlay.vue'
 
 declare const window: any
 
 export default {
   name: 'App',
   components: {
-    SystemBar
+    SystemBar,
+    HistoryOverlay,
   },
   setup() {
     const appearanceStore = useAppearanceStore()
@@ -98,10 +101,14 @@ export default {
     this.settingsStore.$subscribe((language, state) => {
       this.$i18n.locale = this.settingsStore.language
     })
+
+    window.addEventListener('keydown', this.handleGlobalHotkey)
   },
   unmounted() {
     if (this.is_electron())
       window.ipcRenderer.send('close-ws')
+
+    window.removeEventListener('keydown', this.handleGlobalHotkey)
   },
   methods: {
     toggleFooter() {
@@ -135,6 +142,15 @@ export default {
             //el.scrollTop = el.scrollHeight
       }
     },
+    handleGlobalHotkey(e: KeyboardEvent) {
+      if (e.shiftKey && e.key.toLowerCase() === 'h') {
+        this.showHistory()
+      }
+    },
+    showHistory() {
+        const overlay = this.$refs.historyOverlay as any
+        if (overlay) overlay.show()
+    }
   },
 }
 </script>

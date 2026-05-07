@@ -54,6 +54,9 @@
                     <v-spacer v-if="!smAndDown"></v-spacer>
 
                     <div class="d-flex jusqtify-right">
+                        <v-btn class="mr-4" color="secondary" size="small" icon variant="outlined" @click="$emit('show-history')" title="History (Shift+H)">
+                            <v-icon>mdi-history</v-icon>
+                        </v-btn>
                         <v-btn v-if="!is_electron() || speechStore.stt.type.value === 'whisper' || speechStore.stt.type.value === 'api'" class="mr-4"
                             :color="(defaultStore.speech.listening) ? 'success' : 'error'" size="small" icon
                             variant="outlined" @click="toggleListen">

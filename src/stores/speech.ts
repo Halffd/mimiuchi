@@ -99,8 +99,8 @@ export const useSpeechStore = defineStore('speech', {
         defaultStore.speech.start()
         defaultStore.speech.onresult = async (transcript: string, isFinal: boolean) => {
           let processedTranscript = transcript
-          if (isFinal)
-            processedTranscript = await rubyProxy.generate(transcript, this.stt.language)
+          // Generate ruby for both final and interim results
+          processedTranscript = await rubyProxy.generate(transcript, this.stt.language)
 
           const { logs } = useLogStore()
           const log = {
@@ -206,6 +206,7 @@ export const useSpeechStore = defineStore('speech', {
       // finalized text
       if (log.isFinal) {
         logStore.loading_result = false
+        logStore.saveHistory()
 
         // translate if not translating and enabled
         if (is_electron() && translationStore.enabled && !log.translate && !log.translation) {

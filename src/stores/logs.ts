@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { historyBridge } from '@/helpers/history_bridge'
 
 export interface Log {
   transcript: string // original text that was said
@@ -14,6 +15,7 @@ export interface Log {
 
 export const useLogStore = defineStore('logs', {
   state: () => ({
+    sessionId: new Date().getTime().toString(),
     logs: [] as Log[],
     loading_result: false,
     wait_interval: undefined as undefined | ReturnType<typeof setTimeout>,
@@ -22,6 +24,15 @@ export const useLogStore = defineStore('logs', {
 
   },
   actions: {
+    async saveHistory() {
+      const transcript = this.logs.map(l => l.transcript).join(' ')
+      await historyBridge.saveSession({
+        id: this.sessionId,
+        date: new Date().toISOString(),
+        transcript,
+        logs: this.logs
+      })
+    },
     export() {
       const now = new Date()
       let text = ''
