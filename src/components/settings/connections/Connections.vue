@@ -156,6 +156,7 @@
 import ConnectionDialog from '@/components/settings/connections/dialogs/ConnectionDialog.vue'
 import is_electron from '@/helpers/is_electron'
 import { useConnectionStore } from '@/stores/connections'
+import { VCard, VDivider, VCardText, VRow, VCol, VIcon, VListItem, VSpacer, VBtn, VSwitch } from 'vuetify/components'
 
 declare const window: any
 
@@ -167,7 +168,19 @@ declare interface ConnectionType {
 
 export default {
   name: 'SettingsGeneral',
-  components: { ConnectionDialog },
+  components: {
+    ConnectionDialog,
+    VCard,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VIcon,
+    VListItem,
+    VSpacer,
+    VBtn,
+    VSwitch,
+  },
   setup() {
     const connectionStore = useConnectionStore()
 

@@ -61,9 +61,23 @@
 
 <script lang="ts">
 import { useSettingsStore } from '@/stores/settings'
+import { VOverlay, VCard, VAvatar, VImg, VCardTitle, VCardText, VCardActions, VBtn, VDivider, VIcon, VScrollXTransition } from 'vuetify/components'
 
 export default {
   name: 'WelcomeOverlay',
+  components: {
+    VOverlay,
+    VCard,
+    VAvatar,
+    VImg,
+    VCardTitle,
+    VCardText,
+    VCardActions,
+    VBtn,
+    VDivider,
+    VIcon,
+    VScrollXTransition,
+  },
   props: {
     overlay: Boolean,
     page: Number,

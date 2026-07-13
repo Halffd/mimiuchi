@@ -22,9 +22,15 @@
 import is_electron from '@/helpers/is_electron'
 import type { Connection } from '@/stores/connections'
 import { useConnectionStore } from '@/stores/connections'
+import { VRow, VCol, VTextField } from 'vuetify/components'
 
 export default {
   name: 'WebSocketOptions',
+  components: {
+    VRow,
+    VCol,
+    VTextField,
+  },
   props: {
     modelValue: Object,
     type: String,

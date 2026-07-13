@@ -125,11 +125,28 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { WebSpeechLangs } from '../modules/speech/WebSpeech';
 import { rubyProxy } from '@/helpers/ruby_proxy'
 
+import { VSnackbar, VRow, VCol, VBtn, VSelect, VTextField, VProgressLinear, VSpacer, VBadge, VDivider, VForm, VFooter, VIcon } from 'vuetify/components'
+
 declare const window: any
 declare type HistoryStateValue = any
 
 export default {
     name: 'FooterHome',
+    components: {
+      VSnackbar,
+      VRow,
+      VCol,
+      VBtn,
+      VSelect,
+      VTextField,
+      VProgressLinear,
+      VSpacer,
+      VBadge,
+      VDivider,
+      VForm,
+      VFooter,
+      VIcon,
+    },
     props: {
         footerVisible: Boolean,
         fontSize: Number,

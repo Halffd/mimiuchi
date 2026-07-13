@@ -180,6 +180,7 @@
 
 <script lang="ts">
 import { useOSCStore } from '@/stores/osc'
+import { VBtn, VCard, VCardTitle, VCardSubtitle, VCardText, VCardActions, VDivider, VRow, VCol, VChip, VDialog, VTextField, VSelect, VSpacer, VList, VListItem } from 'vuetify/components'
 
 interface Param {
   route: string
@@ -196,6 +197,24 @@ interface Assign {
 
 export default {
   name: 'SettingsGeneral',
+  components: {
+    VBtn,
+    VCard,
+    VCardTitle,
+    VCardSubtitle,
+    VCardText,
+    VCardActions,
+    VDivider,
+    VRow,
+    VCol,
+    VChip,
+    VDialog,
+    VTextField,
+    VSelect,
+    VSpacer,
+    VList,
+    VListItem,
+  },
   setup() {
     const oscStore = useOSCStore()
 

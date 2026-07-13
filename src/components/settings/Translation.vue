@@ -106,11 +106,27 @@
 import { useTranslationStore } from '@/stores/translation'
 import { useSpeechStore } from '@/stores/speech'
 import translation_options from '@/constants/translation_options'
+import { VCard, VDivider, VCardText, VRow, VCol, VChip, VIcon, VListItem, VSwitch, VSelect, VAlert, VAlertTitle, VAutocomplete } from 'vuetify/components'
 
 import is_electron from '@/helpers/is_electron'
 
 export default {
   name: 'SettingsTranslation',
+  components: {
+    VCard,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VChip,
+    VIcon,
+    VListItem,
+    VSwitch,
+    VSelect,
+    VAlert,
+    VAlertTitle,
+    VAutocomplete,
+  },
   setup() {
     const translationStore = useTranslationStore()
     const speechStore = useSpeechStore()

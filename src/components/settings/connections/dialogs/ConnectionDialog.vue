@@ -49,6 +49,7 @@ import WebHookOptions from '@/components/settings/connections/dialogs/WebHookOpt
 import is_electron from '@/helpers/is_electron'
 import type { Connection } from '@/stores/connections'
 import { useConnectionStore } from '@/stores/connections'
+import { VDialog, VCard, VForm, VCardTitle, VDivider, VCardText, VRow, VCol, VIcon, VCardActions, VSpacer, VBtn } from 'vuetify/components'
 
 declare const window: any
 
@@ -63,6 +64,18 @@ export default {
   components: {
     WebSocketOptions,
     WebHookOptions,
+    VDialog,
+    VCard,
+    VForm,
+    VCardTitle,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VIcon,
+    VCardActions,
+    VSpacer,
+    VBtn,
   },
   props: {
     modelValue: Boolean,

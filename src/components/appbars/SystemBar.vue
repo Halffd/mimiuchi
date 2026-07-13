@@ -29,11 +29,20 @@
 
 <script lang="ts">
 import is_electron from '@/helpers/is_electron'
+import { VSystemBar, VIcon, VChip, VSpacer, VBtn, VHover } from 'vuetify/components'
 
 declare const window: any
 
 export default {
   name: 'App',
+  components: {
+    VSystemBar,
+    VIcon,
+    VChip,
+    VSpacer,
+    VBtn,
+    VHover,
+  },
   data() {
     return {
       APP_NAME: __APP_NAME__,

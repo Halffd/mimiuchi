@@ -72,9 +72,22 @@
 
 <script lang="ts">
 import { useWordReplaceStore } from '@/stores/word_replace'
+import { VCard, VDivider, VCardText, VListItem, VSwitch, VRow, VCol, VTextField, VBtn, VCardActions } from 'vuetify/components'
 
 export default {
   name: 'WordReplace',
+  components: {
+    VCard,
+    VDivider,
+    VCardText,
+    VListItem,
+    VSwitch,
+    VRow,
+    VCol,
+    VTextField,
+    VBtn,
+    VCardActions,
+  },
   setup() {
     const wordReplaceStore = useWordReplaceStore()
 

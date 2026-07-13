@@ -146,9 +146,26 @@
 <script lang="ts">
 import { useAppearanceStore } from '@/stores/appearance'
 import { get_fonts } from '@/helpers/get_fonts'
+import { VCard, VDivider, VCardText, VRow, VCol, VAutocomplete, VSelect, VListItem, VSwitch, VBtn, VTextField, VMenu, VColorPicker, VCardTitle } from 'vuetify/components'
 
 export default {
   name: 'SettingsGeneral',
+  components: {
+    VCard,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VAutocomplete,
+    VSelect,
+    VListItem,
+    VSwitch,
+    VBtn,
+    VTextField,
+    VMenu,
+    VColorPicker,
+    VCardTitle,
+  },
   setup() {
     const appearanceStore = useAppearanceStore()
 

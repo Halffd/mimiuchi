@@ -26,18 +26,23 @@ export default defineConfig(({ command }) => {
     },
     plugins: [
       vue(),
-      vuetify({ autoImport: true }),
+      vuetify({ autoImport: false }),
       electron([
         {
           // Main-Process entry file of the Electron App.
           entry: 'electron/main/index.ts',
           onstart(options) {
-            if (process.env.VSCODE_DEBUG)
+            if (process.env.VSCODE_DEBUG) {
               console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
-            else
+            } else if (command === 'serve') {
+              // Do not call options.startup() when running the dev server normally
+              console.log('[startup] Electron App startup suppressed for dev server');
+            } else {
               options.startup()
+            }
           },
           vite: {
+
             build: {
               sourcemap,
               minify: isBuild,

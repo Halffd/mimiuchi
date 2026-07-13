@@ -72,6 +72,7 @@
 
 <script lang="ts">
 import { useDisplay } from 'vuetify'
+import { VNavigationDrawer, VList, VListSubheader, VListItem, VDivider, VCol, VBtn, VIcon, VSpacer } from 'vuetify/components'
 import is_electron from '@/helpers/is_electron'
 import { useSettingsStore } from '@/stores/settings'
 
@@ -79,6 +80,17 @@ declare const window: any
 
 export default {
   name: 'Settings',
+  components: {
+    VNavigationDrawer,
+    VList,
+    VListSubheader,
+    VListItem,
+    VDivider,
+    VCol,
+    VBtn,
+    VIcon,
+    VSpacer,
+  },
   setup() {
     const settingsStore = useSettingsStore()
     const { smAndDown } = useDisplay()

@@ -58,9 +58,25 @@
 import { historyBridge } from '@/helpers/history_bridge'
 import { useLogStore } from '@/stores/logs'
 import { useDefaultStore } from '@/stores/default'
+import { VDialog, VCard, VCardTitle, VBtn, VIcon, VDivider, VCardText, VList, VListItem, VListItemTitle, VListItemSubtitle, VCardActions, VSpacer } from 'vuetify/components'
 
 export default {
   name: 'HistoryOverlay',
+  components: {
+    VDialog,
+    VCard,
+    VCardTitle,
+    VBtn,
+    VIcon,
+    VDivider,
+    VCardText,
+    VList,
+    VListItem,
+    VListItemTitle,
+    VListItemSubtitle,
+    VCardActions,
+    VSpacer,
+  },
   data() {
     return {
       visible: false,

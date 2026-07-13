@@ -98,11 +98,27 @@
 
 <script lang="ts">
 import { useSpeechStore } from '@/stores/speech'
+import { VCard, VDivider, VCardText, VRow, VCol, VListItem, VSwitch, VSelect, VSlider, VTextField, VRadioGroup, VRadio, VIcon } from 'vuetify/components'
 
 const synth = window.speechSynthesis
 
 export default {
   name: 'STT',
+  components: {
+    VCard,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VListItem,
+    VSwitch,
+    VSelect,
+    VSlider,
+    VTextField,
+    VRadioGroup,
+    VRadio,
+    VIcon,
+  },
   setup() {
     const speechStore = useSpeechStore()
 

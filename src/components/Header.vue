@@ -24,9 +24,18 @@
 
 <script lang='ts'>
 import { useSettingsStore } from '@/stores/settings'
+import { VAppBar, VAppBarNavIcon, VContainer, VIcon, VAppBarTitle, VBtn } from 'vuetify/components'
 
 export default {
   name: 'Header',
+  components: {
+    VAppBar,
+    VAppBarNavIcon,
+    VContainer,
+    VIcon,
+    VAppBarTitle,
+    VBtn,
+  },
   setup() {
     const settingsStore = useSettingsStore()
     return {

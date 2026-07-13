@@ -81,9 +81,27 @@ import { useSpeechStore } from '@/stores/speech'
 import { useConnectionStore } from '@/stores/connections'
 import { useLogStore } from '@/stores/logs'
 import { useTranslationStore } from '@/stores/translation'
+import { VCard, VSnackbar, VBtn, VIcon, VDivider, VCardText, VRow, VCol, VRadioGroup, VRadio, VDialog, VCardTitle, VForm, VCardActions, VCheckbox } from 'vuetify/components'
 
 export default {
   name: 'SettingsGeneral',
+  components: {
+    VCard,
+    VSnackbar,
+    VBtn,
+    VIcon,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VRadioGroup,
+    VRadio,
+    VDialog,
+    VCardTitle,
+    VForm,
+    VCardActions,
+    VCheckbox,
+  },
   setup() {
     const appearanceStore = useAppearanceStore()
     const wordReplaceStore = useWordReplaceStore()

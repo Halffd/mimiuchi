@@ -150,7 +150,7 @@ function initialize_ws(win: any, wss: any, port: number) {
             }
           }
           catch (error) {
-            console.error(error)
+            console.error('[Electron] Furigana generation error:', error)
           }
         }
         console.log(`WS => ${message.type}`)

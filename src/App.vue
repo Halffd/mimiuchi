@@ -28,6 +28,7 @@ import is_electron from './helpers/is_electron'
 
 import SystemBar from './components/appbars/SystemBar.vue'
 import HistoryOverlay from '@/components/overlays/HistoryOverlay.vue'
+import { VApp, VMain, VBtn, VIcon } from 'vuetify/components'
 
 declare const window: any
 
@@ -36,6 +37,10 @@ export default {
   components: {
     SystemBar,
     HistoryOverlay,
+    VApp,
+    VMain,
+    VBtn,
+    VIcon,
   },
   setup() {
     const appearanceStore = useAppearanceStore()

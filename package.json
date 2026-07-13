@@ -15,10 +15,11 @@
   ],
   "main": "dist-electron/main/index.js",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --port 5173",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview",
     "test:e2e": "playwright test",
+    "test:kuromoji": "playwright test tests/kuromoji.spec.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
