@@ -107,9 +107,23 @@
 <script lang="ts">
 import { useOSCStore } from '@/stores/osc'
 import is_electron from '@/helpers/is_electron'
+import { VCard, VDivider, VCardText, VRow, VCol, VTextField, VListItem, VSwitch, VAlert, VAlertTitle, VIcon } from 'vuetify/components'
 
 export default {
   name: 'SettingsGeneral',
+  components: {
+    VCard,
+    VDivider,
+    VCardText,
+    VRow,
+    VCol,
+    VTextField,
+    VListItem,
+    VSwitch,
+    VAlert,
+    VAlertTitle,
+    VIcon,
+  },
   setup() {
     const oscStore = useOSCStore()
 

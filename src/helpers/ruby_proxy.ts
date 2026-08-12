@@ -10,6 +10,7 @@ export interface RubyProvider {
 class JapaneseProvider implements RubyProvider {
   private kuroshiro: Kuroshiro
   private initialized: Promise<void>
+  private isInitializedFlag = false
 
   constructor() {
     this.kuroshiro = new Kuroshiro()
@@ -22,6 +23,7 @@ class JapaneseProvider implements RubyProvider {
       // Analyzer needs to be initialized with its dictionary path
       // For browser, it might need to fetch the dictionary
       await this.kuroshiro.init(new Analyzer({ dictPath: 'dict/' }));
+      this.isInitializedFlag = true
       console.log('Kuroshiro analyzer initialized.');
     } catch (error) {
       console.error('Failed to initialize Kuroshiro analyzer:', error);
@@ -35,7 +37,7 @@ class JapaneseProvider implements RubyProvider {
 
   async generate(text: string): Promise<string> {
     await this.initialized; // Ensure Kuroshiro is initialized
-    if (!this.kuroshiro || !this.kuroshiro.isInitialized()) {
+    if (!this.kuroshiro || !this.isInitializedFlag) {
       console.warn('Kuroshiro not initialized, returning original text for Japanese.');
       return text;
     }

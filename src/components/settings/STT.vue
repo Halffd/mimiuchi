@@ -150,10 +150,9 @@
 <script lang="ts">
 import { useSpeechStore } from '@/stores/speech'
 import { WebSpeechLangs } from '@/modules/speech'
-import { VCard, VDivider, VCardText, VRow, VCol, VSelect, VSlider, VBtn, VIcon, VRadioGroup, VCard, VRadio, VTextField, VAlert, VAlertTitle } from 'vuetify/components'
+import { VCard, VDivider, VCardText, VRow, VCol, VSelect, VSlider, VBtn, VIcon, VRadioGroup, VRadio, VTextField, VAlert, VAlertTitle } from 'vuetify/components'
 
 import is_electron from '@/helpers/is_electron'
-import { VCard, VDivider, VCardText, VRow, VCol, VSelect, VSlider, VBtn, VIcon, VRadioGroup, VRadio, VCard, VTextField, VAlert, VAlertTitle } from 'vuetify/components'
 
 declare interface MediaDevice {
   kind?: string

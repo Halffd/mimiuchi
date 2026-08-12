@@ -27,8 +27,7 @@
 
 <script lang="ts">
 // import {ipcRenderer} from "electron"
-import { useDisplay } from "vuetify"
-import { VCard, VExpandTransition, VCol } from "vuetify/components"
+import { useDisplay } from 'vuetify'
 
 import is_electron from '../helpers/is_electron'
 
@@ -44,9 +43,6 @@ declare const window: any
 export default {
   name: 'Home',
   components: {
-    VCard,
-    VExpandTransition,
-    VCol,
     WelcomeOverlay,
   },
   props: {

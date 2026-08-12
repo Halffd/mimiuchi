@@ -151,7 +151,7 @@ export default {
         footerVisible: Boolean,
         fontSize: Number,
     },
-    emits: ['toggle-footer-visibility'],
+    emits: ['toggle-footer-visibility', 'show-history'],
     setup() {
         const { smAndDown } = useDisplay()
         const wordReplaceStore = useWordReplaceStore()
